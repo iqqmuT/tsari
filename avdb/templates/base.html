@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'avdb/css/bootstrap-flatly.css' %}">
+    <link rel="stylesheet" href="{% static 'avdb/css/tsari.css' %}">
+  </head>
+  <body>
+
+    {% block main %}
+    {% endblock %}
+
+    <script src="{% static 'avdb/js/jquery-3.2.1.slim.min.js' %}"></script>
+    <script src="{% static 'avdb/js/popper.min.js' %}"></script>
+    <script src="{% static 'avdb/js/bootstrap.min.js' %}"></script>
+
+    {% block javascript %}
+    {% endblock %}
+  </body>
+</html>
