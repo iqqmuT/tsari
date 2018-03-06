@@ -54,6 +54,8 @@ class Convention(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
+        if self.lang is not None:
+            return "%s (%s)" % (self.name, self.lang.code)
         return self.name
 
     class Meta:
