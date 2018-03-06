@@ -120,7 +120,7 @@ class TransportOrder(models.Model):
         else:
             to_s = to_loc
 
-        return "%s: %s - %s" % (self.name, from_s, to_s)
+        return "%s: %s → %s" % (self.name, from_s, to_s)
 
 
 class EquipmentType(models.Model):
