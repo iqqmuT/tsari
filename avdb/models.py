@@ -187,7 +187,7 @@ class TransportOrderLine(models.Model):
         return "%s, %s" % (self.transport_order, self.equipment)
 
     class Meta:
-        ordering = ['created']
+        ordering = ['transport_order__name', 'equipment__name']
 
 class UnitType(models.Model):
     name = models.CharField(max_length=64)
