@@ -120,8 +120,20 @@ class TransportOrder(models.Model):
 
         return "%s: %s - %s" % (self.name, from_s, to_s)
 
+
+class EquipmentType(models.Model):
+    name = models.CharField(max_length=64)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
+
 class Equipment(models.Model):
     name = models.CharField(max_length=256)
+    equipment_type = models.ForeignKey(EquipmentType, null=True, on_delete=models.SET_NULL)
     footprint = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2)
     pallet_space = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2)
     space_calculated = models.BooleanField(default=False)
