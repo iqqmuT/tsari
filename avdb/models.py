@@ -122,6 +122,8 @@ class TransportOrder(models.Model):
 
         return "%s: %s → %s" % (self.name, from_s, to_s)
 
+    class Meta:
+        ordering = ['name']
 
 class EquipmentType(models.Model):
     name = models.CharField(max_length=64)
