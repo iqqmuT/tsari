@@ -1,4 +1,4 @@
-# Using in Docker
+# Using with Docker
 
 Use [Docker Compose][1].
 
