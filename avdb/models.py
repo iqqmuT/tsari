@@ -98,8 +98,8 @@ class TransportOrder(models.Model):
         on_delete=models.CASCADE,
         related_name='to_loc',
     )
-    from_loc_load_out = models.DateTimeField()
-    to_loc_load_in = models.DateTimeField()
+    from_loc_load_out = models.DateTimeField(null=True, blank=True)
+    to_loc_load_in = models.DateTimeField(null=True, blank=True)
     notes = models.CharField(max_length=512, blank=True)
     unit_notes = models.CharField(max_length=512, blank=True)
     created = models.DateTimeField(auto_now_add=True)
