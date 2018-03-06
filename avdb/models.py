@@ -183,6 +183,9 @@ class TransportOrderLine(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return "%s, %s" % (self.transport_order, self.equipment)
+
     class Meta:
         ordering = ['created']
 
