@@ -22,6 +22,10 @@ Start:
 
     docker-compose up
 
+Stop:
+
+Press `Ctrl-C`.
+
 ## Invoking Django commands
 
     docker-compose run web python3 manage.py <command>
@@ -59,11 +63,11 @@ Then exit from psql shell and run:
 
 How to create a new dump:
 
-    docker-compose run web python3 manage.py dumpdata > mittaus/fixtures/test01.json
+    docker-compose run web python3 manage.py dumpdata > fixtures/test01.json
 
 How to load the dump:
 
-    docker-compose run web python3 manage.py loaddata test01.json
+    docker-compose run web python3 manage.py loaddata fixtures/test01.json
 
 ## Destroying Containers
 
