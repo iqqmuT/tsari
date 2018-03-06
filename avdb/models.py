@@ -70,8 +70,8 @@ class ContactPerson(models.Model):
     def __str__(self):
         return self.name
 
-class Shipment(models.Model):
-    name = models.CharField(max_length=128, blank=True)
+class TransportOrder(models.Model):
+    name = models.CharField(max_length=256, blank=True)
     from_convention = models.ForeignKey(
         Convention,
         null=True,
@@ -99,11 +99,26 @@ class Shipment(models.Model):
     from_loc_load_out = models.DateTimeField()
     to_loc_load_in = models.DateTimeField()
     notes = models.CharField(max_length=512, blank=True)
+    unit_notes = models.CharField(max_length=512, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        s = self.name + ' '
+
+        from_s = ''
+        if self.from_convention is not None:
+            from_s = self.from_convention
+        else:
+            from_s = str(self.from_loc)
+
+        to_s = ''
+        if self.to_convention is not None:
+            to_s = self.to_convention
+        else:
+            to_s = to_loc
+
+        return "%s: %s - %s" % (self.name, from_s, to_s)
 
 class Equipment(models.Model):
     name = models.CharField(max_length=256)
@@ -147,6 +162,15 @@ class Equipment(models.Model):
     def update_gross_weight(self):
         self.gross_weight = self.unit_field_sum('gross_weight')
         return self.save()
+
+class TransportOrderLine(models.Model):
+    transport_order = models.ForeignKey(TransportOrder, on_delete=models.CASCADE)
+    equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['created']
 
 class UnitType(models.Model):
     name = models.CharField(max_length=64)
@@ -292,7 +316,10 @@ class ItemFailure(models.Model):
     class Meta:
         ordering = ['created']
 
-class ShipmentStatusType(models.Model):
+
+# Status models
+
+class TransportOrderStatusType(models.Model):
     name = models.CharField(max_length=64)
 
     def __str__(self):
@@ -301,10 +328,10 @@ class ShipmentStatusType(models.Model):
     class Meta:
         ordering = ['name']
 
-# Abstract base class for *ShipmentStatus models
-class ShipmentStatus(models.Model):
-    shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE)
-    status_type = models.ForeignKey(ShipmentStatusType, null=True, on_delete=models.SET_NULL)
+
+# Abstract base class for *Status models
+class BaseStatus(models.Model):
+    status = models.ForeignKey(TransportOrderStatusType, null=True, on_delete=models.SET_NULL)
     reporter = models.CharField(max_length=128)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -312,35 +339,32 @@ class ShipmentStatus(models.Model):
     class Meta:
         abstract = True
 
-class EquipmentShipmentStatus(ShipmentStatus):
-    equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)
+
+class TransportOrderLineStatus(BaseStatus):
+    """
+    TransportOrderLineStatus does not need FK to TransportOrder,
+    it can be solved through TransportOrderLine.
+    """
+    to_line = models.ForeignKey(TransportOrderLine, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['created']
-        verbose_name_plural = 'Equipment shipment status'
+        verbose_name_plural = 'Transport order line status'
 
-class UnitShipmentStatus(ShipmentStatus):
+
+class OrderUnitStatus(BaseStatus):
+    transport_order = models.ForeignKey(TransportOrder, on_delete=models.CASCADE)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['created']
-        verbose_name_plural = 'Unit shipment status'
+        verbose_name_plural = 'Order unit status'
 
-class ItemShipmentStatus(ShipmentStatus):
+
+class OrderItemStatus(BaseStatus):
+    transport_order = models.ForeignKey(TransportOrder, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['created']
-        verbose_name_plural = 'Item shipment status'
-
-class LoadingList(models.Model):
-    shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE)
-    equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return "%s - %s" % (self.shipment, self.equipment)
-
-    class Meta:
-        ordering = ['created']
+        verbose_name_plural = 'Order item status'
