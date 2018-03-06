@@ -112,13 +112,13 @@ class TransportOrder(models.Model):
         if self.from_convention is not None:
             from_s = self.from_convention
         else:
-            from_s = str(self.from_loc)
+            from_s = self.from_loc
 
         to_s = ''
         if self.to_convention is not None:
             to_s = self.to_convention
         else:
-            to_s = to_loc
+            to_s = self.to_loc
 
         return "%s: %s → %s" % (self.name, from_s, to_s)
 
