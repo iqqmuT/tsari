@@ -15,10 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from avdb import views
+from avdb import views as avdb_views
+from imports import views as imports_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('import_csv_form', views.import_csv_form, name='import_csv_form'),
-    path('start/', views.start, name='start'),
+    path('import/locations/', imports_views.import_locations, name='import_locations'),
+    #path('import/', imports_views.import_csv_form, name='import_csv_form'),
+    path('start/', avdb_views.start, name='start'),
 ]

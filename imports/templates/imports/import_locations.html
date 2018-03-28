@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<div class="container">
+  <h1>Import Locations From CSV File</h1>
+
+  <form action="{% url 'import_locations' %}" method="post" enctype="multipart/form-data" style="margin-top: 25px;">
+    {% csrf_token %}
+    {{ form }}
+    <div class="form-group" style="margin-top: 25px; margin-bottom: 25px;">
+      <input type="submit" value="Import locations" class="btn btn-primary">
+    </div>
+  </form>
+
+  {% if error %}
+    <h3>Error</h3>
+    <div>{{ error }}</div>
+  {% endif %}
+
+  {% if failed %}
+    <h3 class="text-danger">{{ failed|length }} rows failed</h3>
+    <table class="table table-sm">
+      <thead>
+        <tr class="table-danger">
+          <th>Location name</th>
+          <th>Address</th>
+          <th>Location type</th>
+          <th>Abbreviation</th>
+        </tr>
+      </thead>
+    {% for row in failed %}
+      <tr>
+        <td>{{ row.0 }}</td>
+        <td>{{ row.1 }}</td>
+        <td>{{ row.2 }}</td>
+        <td>{{ row.3 }}</td>
+      </tr>
+    {% endfor %}
+    </table>
+  {% endif %}
+
+  {% if imported %}
+    <h3>{{ imported|length }} locations imported</h3>
+    {% for location in imported %}
+      <div>
+        {{ location }}
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+{% endblock %}
