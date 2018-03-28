@@ -63,7 +63,9 @@ Then exit from psql shell and run:
 
 How to create a new dump:
 
-    docker-compose run web python3 manage.py dumpdata > fixtures/test01.json
+    docker-compose run web python3 manage.py dumpdata --indent 2 > fixtures/test01.json
+    # Another example
+    docker-compose run web python3 manage.py dumpdata --indent 2 admin auth.user avdb > fixtures/test02.json
 
 How to load the dump:
 

@@ -191,6 +191,7 @@ class TransportOrderLine(models.Model):
     class Meta:
         ordering = ['transport_order__name', 'equipment__name']
 
+
 class UnitType(models.Model):
     name = models.CharField(max_length=64)
 
@@ -285,6 +286,20 @@ class Unit(models.Model):
             # no parent unit, update equipment gross weight
             self.equipment.update_gross_weight()
 
+class TransportOrderUnit(models.Model):
+    transport_order = models.ForeignKey(TransportOrder, on_delete=models.CASCADE)
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
+    included = models.BooleanField(default=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return "%s, %s" % (self.transport_order, self.unit)
+
+    class Meta:
+        ordering = ['transport_order__name', 'unit__name']
+
+
 class ItemType(models.Model):
     name = models.CharField(max_length=64)
 
@@ -372,8 +387,7 @@ class TransportOrderLineStatus(BaseStatus):
 
 
 class OrderUnitStatus(BaseStatus):
-    transport_order = models.ForeignKey(TransportOrder, on_delete=models.CASCADE)
-    unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
+    to_unit = models.ForeignKey(TransportOrderUnit, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['created']
