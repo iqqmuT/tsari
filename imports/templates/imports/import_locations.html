@@ -3,23 +3,33 @@
 {% block main %}
 
 <div class="container">
-  <h1>Import Locations From CSV File</h1>
+  <h1>
+    <i class="fas fa-upload"></i>
+    Import Locations From CSV File</h1>
 
   <form action="{% url 'import_locations' %}" method="post" enctype="multipart/form-data" style="margin-top: 25px;">
     {% csrf_token %}
     {{ form }}
     <div class="form-group" style="margin-top: 25px; margin-bottom: 25px;">
-      <input type="submit" value="Import locations" class="btn btn-primary">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-upload"></i>
+        Import locations
+      </button>
     </div>
   </form>
 
   {% if error %}
-    <h3>Error</h3>
-    <div>{{ error }}</div>
+    <h3 class="text-danger">
+      <i class="fas fa-times"></i>
+      Error</h3>
+    <p>{{ error }}</p>
   {% endif %}
 
   {% if failed %}
-    <h3 class="text-danger">{{ failed|length }} rows failed</h3>
+    <h3 class="text-danger">
+      <i class="fas fa-times"></i>
+      {{ failed|length }} rows failed</h3>
+
     <table class="table table-sm">
       <thead>
         <tr class="table-danger">
@@ -41,12 +51,28 @@
   {% endif %}
 
   {% if imported %}
-    <h3>{{ imported|length }} locations imported</h3>
+    <h3>
+      <i class="fas fa-check"></i>
+      {{ imported|length }} locations imported</h3>
+
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th>Location name</th>
+          <th>Address</th>
+          <th>Location type</th>
+          <th>Abbreviation</th>
+        </tr>
+      </thead>
     {% for location in imported %}
-      <div>
-        {{ location }}
-      </div>
+      <tr>
+        <td>{{ location }}</td>
+        <td>{{ location.address }}</td>
+        <td>{{ location.loc_type }}</td>
+        <td>{{ location.abbreviation }}</td>
+      </tr>
     {% endfor %}
+    </table>
   {% endif %}
 </div>
 
