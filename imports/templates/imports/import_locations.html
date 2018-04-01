@@ -10,37 +10,16 @@
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">Example data</h5>
-      <table class="table table-sm">
-        <thead>
-          <tr>
-            <th>Location name</th>
-            <th>Address</th>
-            <th>Location type</th>
-            <th>Abbreviation</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Ice Hockey Hall</td>
-            <td>Street 1, 00010 City</td>
-            <td>Convention venue</td>
-            <td>ICE</td>
-          </tr>
-          <tr>
-            <td>Branch Depot</td>
-            <td>Street 2, 00020 Town</td>
-            <td>Bethel</td>
-            <td>BRA</td>
-          </tr>
-        </tbody>
-      </table>
+      <pre><code>Location name;Address;Location type;Abbreviation
+Ice Hockey Hall;Street 1, 00100 City;Convention venue;ICE
+Branch Depot;Street 2, 00020 Town;Bethel;BRA</code></pre>
     </div>
   </div>
 
   <form action="{% url 'import_locations' %}" method="post" enctype="multipart/form-data" style="margin-top: 25px;">
     {% csrf_token %}
     {{ form }}
-    <div class="form-group" style="margin-top: 25px; margin-bottom: 25px;">
+    <div class="form-group" style="margin-top: 25px; margin-bottom: 50px;">
       <button type="submit" class="btn btn-primary">
         <i class="fas fa-upload"></i>
         Import locations

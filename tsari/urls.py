@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('import/locations/', imports_views.import_locations, name='import_locations'),
     path('import/conventions/', imports_views.import_conventions, name='import_conventions'),
+    path('import/contact_persons/', imports_views.import_contact_persons, name='import_contact_persons'),
     #path('import/', imports_views.import_csv_form, name='import_csv_form'),
     path('start/', avdb_views.start, name='start'),
 ]

@@ -5,23 +5,23 @@
 <div class="container">
   <h1 style="margin-top: 50px; margin-bottom: 25px;">
     <i class="fas fa-upload"></i>
-    Import Conventions From CSV File</h1>
+    Import Contact Persons From CSV File</h1>
 
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">Example data</h5>
-      <pre><code>Convention name;Language;Starts;Ends;Load in;Load out;Location
-Helsinki;FI;2018-06-15;2018-06-17;2018-06-15 09:00;2018-06-17 09:10;HEL</code></pre>
+      <pre><code>Contact name;Phone;Email;Convention
+John Doe;+12345678;john@doe.com;Helsinki</code></pre>
     </div>
   </div>
 
-  <form action="{% url 'import_conventions' %}" method="post" enctype="multipart/form-data" style="margin-top: 25px;">
+  <form action="{% url 'import_contact_persons' %}" method="post" enctype="multipart/form-data" style="margin-top: 25px;">
     {% csrf_token %}
     {{ form }}
     <div class="form-group" style="margin-top: 25px; margin-bottom: 50px;">
       <button type="submit" class="btn btn-primary">
         <i class="fas fa-upload"></i>
-        Import conventions
+        Import contact persons
       </button>
     </div>
   </form>
@@ -41,13 +41,10 @@ Helsinki;FI;2018-06-15;2018-06-17;2018-06-15 09:00;2018-06-17 09:10;HEL</code></
     <table class="table table-sm">
       <thead>
         <tr class="table-danger">
-          <th>Convention name</th>
-          <th>Language</th>
-          <th>Starts</th>
-          <th>Ends</th>
-          <th>Load in</th>
-          <th>Load out</th>
-          <th>Location</th>
+          <th>Contact name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Convention</th>
         </tr>
       </thead>
     {% for row in failed %}
@@ -56,9 +53,6 @@ Helsinki;FI;2018-06-15;2018-06-17;2018-06-15 09:00;2018-06-17 09:10;HEL</code></
         <td class="{% if row.1.error %}text-danger{% endif %}">{{ row.1.val }}</td>
         <td class="{% if row.2.error %}text-danger{% endif %}">{{ row.2.val }}</td>
         <td class="{% if row.3.error %}text-danger{% endif %}">{{ row.3.val }}</td>
-        <td class="{% if row.4.error %}text-danger{% endif %}">{{ row.4.val }}</td>
-        <td class="{% if row.5.error %}text-danger{% endif %}">{{ row.5.val }}</td>
-        <td class="{% if row.6.error %}text-danger{% endif %}">{{ row.6.val }}</td>
       </tr>
     {% endfor %}
     </table>
@@ -67,29 +61,23 @@ Helsinki;FI;2018-06-15;2018-06-17;2018-06-15 09:00;2018-06-17 09:10;HEL</code></
   {% if imported %}
     <h3>
       <i class="fas fa-check"></i>
-      {{ imported|length }} conventions imported</h3>
+      {{ imported|length }} locations imported</h3>
 
     <table class="table table-sm">
       <thead>
         <tr>
-          <th>Convention name</th>
-          <th>Language</th>
-          <th>Starts</th>
-          <th>Ends</th>
-          <th>Load in</th>
-          <th>Load out</th>
-          <th>Location</th>
+          <th>Contact name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Convention</th>
         </tr>
       </thead>
-    {% for convention in imported %}
+    {% for person in imported %}
       <tr>
-        <td>{{ convention }}</td>
-        <td>{{ convention.lang }}</td>
-        <td>{{ convention.starts }}</td>
-        <td>{{ convention.ends }}</td>
-        <td>{{ convention.load_in }}</td>
-        <td>{{ convention.load_out }}</td>
-        <td>{{ convention.location }}</td>
+        <td>{{ person.name }}</td>
+        <td>{{ person.phone }}</td>
+        <td>{{ person.email }}</td>
+        <td>{{ person.convention }}</td>
       </tr>
     {% endfor %}
     </table>

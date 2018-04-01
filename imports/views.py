@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 
 from avdb.models import \
+    ContactPerson, \
     Convention, \
     Language, \
     Location, \
@@ -193,6 +194,76 @@ def handle_conventions_file(f):
             failed.append(row)
 
     return (None, imported, failed)
+
+
+# ---------------
+# CONTACT PERSONS
+# ---------------
+
+contact_person_columns = ['Contact name', 'Phone', 'Email', 'Convention']
+
+def import_contact_persons(request):
+    error = None
+    imported = []
+    failed = []
+    if request.method == 'POST':
+        form = ImportCSVFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            error, imported, failed = handle_contact_persons_file(request.FILES['file'])
+    else:
+        # show blank form
+        form = ImportCSVFileForm()
+
+    return render(request, 'imports/import_contact_persons.html', {
+        'form': form,
+        'error': error,
+        'imported': imported,
+        'failed': failed
+    })
+
+def handle_contact_persons_file(f):
+    try:
+        reader = get_csv_reader(f)
+    except UnicodeDecodeError:
+        return ('Invalid CSV file. Make sure CSV is in UTF-8 format.', [], [])
+
+    imported = []
+    failed = []
+
+    first_row = True
+    for row in reader:
+
+        row = convert_row(row)
+
+        if first_row and not header_row_is_valid(row, contact_person_columns):
+            return ('Invalid conventions CSV data. Header must be "%s"' % csv_delimiter.join(contact_person_columns), [], [])
+
+        if first_row:
+            first_row = False
+            continue
+
+        error = False
+
+        convention = Convention.objects.filter(name=row[3]['val']).first()
+        if convention is None:
+            row[3]['error'] = 'Invalid value'
+            error = True
+
+        if not error:
+            # import convention row
+            person = ContactPerson(
+                name=row[0]['val'],
+                phone=row[1]['val'],
+                email=row[2]['val'],
+                convention=convention,
+            )
+            person.save()
+            imported.append(person)
+        else:
+            failed.append(row)
+
+    return (None, imported, failed)
+
 
 
 # ----
