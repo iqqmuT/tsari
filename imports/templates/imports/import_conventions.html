@@ -5,7 +5,7 @@
 <div class="container">
   <h1 style="margin-top: 50px; margin-bottom: 25px;">
     <i class="fas fa-upload"></i>
-    Import Locations From CSV File</h1>
+    Import Conventions From CSV File</h1>
 
   <div class="card">
     <div class="card-body">
@@ -13,37 +13,37 @@
       <table class="table table-sm">
         <thead>
           <tr>
-            <th>Location name</th>
-            <th>Address</th>
-            <th>Location type</th>
-            <th>Abbreviation</th>
+            <th>Convention name</th>
+            <th>Language</th>
+            <th>Starts</th>
+            <th>Ends</th>
+            <th>Load in</th>
+            <th>Load out</th>
+            <th>Location</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>Ice Hockey Hall</td>
-            <td>Street 1, 00010 City</td>
-            <td>Convention venue</td>
-            <td>ICE</td>
-          </tr>
-          <tr>
-            <td>Branch Depot</td>
-            <td>Street 2, 00020 Town</td>
-            <td>Bethel</td>
-            <td>BRA</td>
+            <td>Helsinki</td>
+            <td>FI</td>
+            <td>2018-06-15</td>
+            <td>2018-06-17</td>
+            <td>2018-06-15 09:00</td>
+            <td>2018-06-17 09:10</td>
+            <td>HEL</td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <form action="{% url 'import_locations' %}" method="post" enctype="multipart/form-data" style="margin-top: 25px;">
+  <form action="{% url 'import_conventions' %}" method="post" enctype="multipart/form-data" style="margin-top: 25px;">
     {% csrf_token %}
     {{ form }}
     <div class="form-group" style="margin-top: 25px; margin-bottom: 25px;">
       <button type="submit" class="btn btn-primary">
         <i class="fas fa-upload"></i>
-        Import locations
+        Import conventions
       </button>
     </div>
   </form>
@@ -63,10 +63,13 @@
     <table class="table table-sm">
       <thead>
         <tr class="table-danger">
-          <th>Location name</th>
-          <th>Address</th>
-          <th>Location type</th>
-          <th>Abbreviation</th>
+          <th>Convention name</th>
+          <th>Language</th>
+          <th>Starts</th>
+          <th>Ends</th>
+          <th>Load in</th>
+          <th>Load out</th>
+          <th>Location</th>
         </tr>
       </thead>
     {% for row in failed %}
@@ -75,6 +78,9 @@
         <td class="{% if row.1.error %}text-danger{% endif %}">{{ row.1.val }}</td>
         <td class="{% if row.2.error %}text-danger{% endif %}">{{ row.2.val }}</td>
         <td class="{% if row.3.error %}text-danger{% endif %}">{{ row.3.val }}</td>
+        <td class="{% if row.4.error %}text-danger{% endif %}">{{ row.4.val }}</td>
+        <td class="{% if row.5.error %}text-danger{% endif %}">{{ row.5.val }}</td>
+        <td class="{% if row.6.error %}text-danger{% endif %}">{{ row.6.val }}</td>
       </tr>
     {% endfor %}
     </table>
@@ -83,23 +89,29 @@
   {% if imported %}
     <h3>
       <i class="fas fa-check"></i>
-      {{ imported|length }} locations imported</h3>
+      {{ imported|length }} conventions imported</h3>
 
     <table class="table table-sm">
       <thead>
         <tr>
-          <th>Location name</th>
-          <th>Address</th>
-          <th>Location type</th>
-          <th>Abbreviation</th>
+          <th>Convention name</th>
+          <th>Language</th>
+          <th>Starts</th>
+          <th>Ends</th>
+          <th>Load in</th>
+          <th>Load out</th>
+          <th>Location</th>
         </tr>
       </thead>
-    {% for location in imported %}
+    {% for convention in imported %}
       <tr>
-        <td>{{ location }}</td>
-        <td>{{ location.address }}</td>
-        <td>{{ location.loc_type }}</td>
-        <td>{{ location.abbreviation }}</td>
+        <td>{{ convention }}</td>
+        <td>{{ convention.lang }}</td>
+        <td>{{ convention.starts }}</td>
+        <td>{{ convention.ends }}</td>
+        <td>{{ convention.load_in }}</td>
+        <td>{{ convention.load_out }}</td>
+        <td>{{ convention.location }}</td>
       </tr>
     {% endfor %}
     </table>
