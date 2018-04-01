@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<div class="container">
+  <h1 style="margin-top: 50px; margin-bottom: 25px;">
+    <i class="fas fa-upload"></i>
+    Import Equipments From CSV File</h1>
+
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Example data</h5>
+      <pre><code>Equipment name;Type;Footprint;Pallet space;Gross weight
+5x3 LED FI-1;Video;3.42;6;56</code></pre>
+    </div>
+  </div>
+
+  <form action="{% url 'import_equipments' %}" method="post" enctype="multipart/form-data" style="margin-top: 25px;">
+    {% csrf_token %}
+    {{ form }}
+    <div class="form-group" style="margin-top: 25px; margin-bottom: 50px;">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-upload"></i>
+        Import equipments
+      </button>
+    </div>
+  </form>
+
+  {% if error %}
+    <h3 class="text-danger">
+      <i class="fas fa-times"></i>
+      Error</h3>
+    <p>{{ error }}</p>
+  {% endif %}
+
+  {% if failed %}
+    <h3 class="text-danger">
+      <i class="fas fa-times"></i>
+      {{ failed|length }} rows failed</h3>
+
+    <table class="table table-sm">
+      <thead>
+        <tr class="table-danger">
+          <th>Equipment name</th>
+          <th>Type</th>
+          <th>Footprint</th>
+          <th>Pallet space</th>
+          <th>Gross weight</th>
+        </tr>
+      </thead>
+    {% for row in failed %}
+      <tr>
+        <td class="{% if row.0.error %}text-danger{% endif %}">{{ row.0.val }}</td>
+        <td class="{% if row.1.error %}text-danger{% endif %}">{{ row.1.val }}</td>
+        <td class="{% if row.2.error %}text-danger{% endif %}">{{ row.2.val }}</td>
+        <td class="{% if row.3.error %}text-danger{% endif %}">{{ row.3.val }}</td>
+        <td class="{% if row.4.error %}text-danger{% endif %}">{{ row.4.val }}</td>
+      </tr>
+    {% endfor %}
+    </table>
+  {% endif %}
+
+  {% if imported %}
+    <h3>
+      <i class="fas fa-check"></i>
+      {{ imported|length }} equipments imported</h3>
+
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th>Equipment name</th>
+          <th>Type</th>
+          <th>Footprint</th>
+          <th>Pallet space</th>
+          <th>Gross weight</th>
+        </tr>
+      </thead>
+    {% for eq in imported %}
+      <tr>
+        <td>{{ eq.name }}</td>
+        <td>{{ eq.equipment_type }}</td>
+        <td>{{ eq.footprint }}</td>
+        <td>{{ eq.pallet_space }}</td>
+        <td>{{ eq.gross_weight }}</td>
+      </tr>
+    {% endfor %}
+    </table>
+  {% endif %}
+</div>
+
+{% endblock %}

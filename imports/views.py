@@ -5,6 +5,8 @@ from django.http import HttpResponseRedirect
 from avdb.models import \
     ContactPerson, \
     Convention, \
+    Equipment, \
+    EquipmentType, \
     Language, \
     Location, \
     LocationType
@@ -264,6 +266,76 @@ def handle_contact_persons_file(f):
 
     return (None, imported, failed)
 
+
+# ----------
+# EQUIPMENTS
+# ----------
+
+equipment_columns = ['Equipment name', 'Type', 'Footprint', 'Pallet space', 'Gross weight']
+
+def import_equipments(request):
+    error = None
+    imported = []
+    failed = []
+    if request.method == 'POST':
+        form = ImportCSVFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            error, imported, failed = handle_equipments_file(request.FILES['file'])
+    else:
+        # show blank form
+        form = ImportCSVFileForm()
+
+    return render(request, 'imports/import_equipments.html', {
+        'form': form,
+        'error': error,
+        'imported': imported,
+        'failed': failed
+    })
+
+def handle_equipments_file(f):
+    try:
+        reader = get_csv_reader(f)
+    except UnicodeDecodeError:
+        return ('Invalid CSV file. Make sure CSV is in UTF-8 format.', [], [])
+
+    imported = []
+    failed = []
+
+    first_row = True
+    for row in reader:
+
+        row = convert_row(row)
+
+        if first_row and not header_row_is_valid(row, equipment_columns):
+            return ('Invalid conventions CSV data. Header must be "%s"' % csv_delimiter.join(equipment_columns), [], [])
+
+        if first_row:
+            first_row = False
+            continue
+
+        error = False
+
+        try:
+            equipment_type = EquipmentType.objects.get(name=row[1]['val'])
+        except ObjectDoesNotExist:
+            row[1]['error'] = 'Invalid value'
+            error = True
+
+        if not error:
+            # import equipment row
+            equipment = Equipment(
+                name=row[0]['val'],
+                equipment_type=equipment_type,
+                footprint=row[2]['val'],
+                pallet_space=row[3]['val'],
+                gross_weight=row[4]['val'],
+            )
+            equipment.save()
+            imported.append(equipment)
+        else:
+            failed.append(row)
+
+    return (None, imported, failed)
 
 
 # ----
