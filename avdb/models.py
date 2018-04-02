@@ -31,8 +31,22 @@ class LocationType(models.Model):
 class Location(models.Model):
     name = models.CharField(max_length=128)
     address = models.CharField(max_length=256)
+    entrance = models.CharField(max_length=128, blank=True)
     loc_type = models.ForeignKey(LocationType, null=True, on_delete=models.SET_NULL)
     abbreviation = models.CharField(max_length=16)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
+class ContactPerson(models.Model):
+    name = models.CharField(max_length=64)
+    phone = models.CharField(max_length=128, blank=True)
+    email = models.CharField(max_length=128, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -49,28 +63,18 @@ class Convention(models.Model):
     ends = models.DateField(blank=True, null=True)
     load_in = models.DateTimeField(blank=True, null=True)
     load_out = models.DateTimeField(blank=True, null=True)
-    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    location = models.ForeignKey(Location, null=True, on_delete=models.SET_NULL)
+    contact_person = models.ForeignKey(ContactPerson, null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         if self.lang is not None:
-            return "%s (%s)" % (self.name, self.lang.code)
+            return "%s (%s) %d" % (self.name, self.lang.code, self.id)
         return self.name
 
     class Meta:
         ordering = ['starts', 'name']
-
-class ContactPerson(models.Model):
-    name = models.CharField(max_length=64)
-    phone = models.CharField(max_length=128, blank=True)
-    email = models.CharField(max_length=128, blank=True)
-    convention = models.ForeignKey(Convention, on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name
 
 class TransportOrder(models.Model):
     name = models.CharField(max_length=256, blank=True)
@@ -141,7 +145,6 @@ class Equipment(models.Model):
     footprint = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2)
     pallet_space = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2)
     space_calculated = models.BooleanField(default=False)
-    gross_weight = models.IntegerField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -175,9 +178,9 @@ class Equipment(models.Model):
         self.calculate_pallet_space()
         self.space_calculated = True
 
-    def update_gross_weight(self):
-        self.gross_weight = self.unit_field_sum('gross_weight')
-        return self.save()
+    def weight(self):
+        """Returns gross weight of equipment."""
+        return self.unit_field_sum('gross_weight')
 
 class TransportOrderLine(models.Model):
     transport_order = models.ForeignKey(TransportOrder, on_delete=models.CASCADE)
