@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<div class="container">
+  <h1 style="margin-top: 50px; margin-bottom: 25px;">
+    <i class="fas fa-upload"></i>
+    Import Items From CSV File</h1>
+
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Example data</h5>
+      <pre><code>Item name;Brand;Model;Serial number;Type;Weight;Width;Height;Depth;Failure;Length;Connector;Unit
+Bolt;;;;Accessory;;;;;;;Bolt Box
+</code></pre>
+    </div>
+  </div>
+
+  <form action="{% url 'import_items' %}" method="post" enctype="multipart/form-data" style="margin-top: 25px;">
+    {% csrf_token %}
+    {{ form }}
+    <div class="form-group" style="margin-top: 25px; margin-bottom: 50px;">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-upload"></i>
+        Import items
+      </button>
+    </div>
+  </form>
+
+  {% if error %}
+    <h3 class="text-danger">
+      <i class="fas fa-times"></i>
+      Error</h3>
+    <p>{{ error }}</p>
+  {% endif %}
+
+  {% if failed %}
+    <h3 class="text-danger">
+      <i class="fas fa-times"></i>
+      {{ failed|length }} rows failed</h3>
+
+    <table class="table table-sm">
+      <thead>
+        <tr class="table-danger">
+          <th>Item name</th>
+          <th>Brand</th>
+          <th>Model</th>
+          <th>Serial number</th>
+          <th>Type</th>
+          <th>Weight</th>
+          <th>Width</th>
+          <th>Height</th>
+          <th>Depth</th>
+          <th>Failure</th>
+          <th>Length</th>
+          <th>Connector</th>
+          <th>Unit</th>
+        </tr>
+      </thead>
+    {% for row in failed %}
+      <tr>
+        <td class="{% if row.0.error %}text-danger{% endif %}">{{ row.0.val }}</td>
+        <td class="{% if row.1.error %}text-danger{% endif %}">{{ row.1.val }}</td>
+        <td class="{% if row.2.error %}text-danger{% endif %}">{{ row.2.val }}</td>
+        <td class="{% if row.3.error %}text-danger{% endif %}">{{ row.3.val }}</td>
+        <td class="{% if row.4.error %}text-danger{% endif %}">{{ row.4.val }}</td>
+        <td class="{% if row.5.error %}text-danger{% endif %}">{{ row.5.val }}</td>
+        <td class="{% if row.6.error %}text-danger{% endif %}">{{ row.6.val }}</td>
+        <td class="{% if row.7.error %}text-danger{% endif %}">{{ row.7.val }}</td>
+        <td class="{% if row.8.error %}text-danger{% endif %}">{{ row.8.val }}</td>
+        <td class="{% if row.9.error %}text-danger{% endif %}">{{ row.9.val }}</td>
+        <td class="{% if row.10.error %}text-danger{% endif %}">{{ row.10.val }}</td>
+        <td class="{% if row.11.error %}text-danger{% endif %}">{{ row.11.val }}</td>
+        <td class="{% if row.12.error %}text-danger{% endif %}">{{ row.12.val }}</td>
+      </tr>
+    {% endfor %}
+    </table>
+  {% endif %}
+
+  {% if imported %}
+    <h3>
+      <i class="fas fa-check"></i>
+      {{ imported|length }} items imported</h3>
+
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th>Item name</th>
+          <th>Brand</th>
+          <th>Model</th>
+          <th>Serial number</th>
+          <th>Type</th>
+          <th>Weight</th>
+          <th>Width</th>
+          <th>Height</th>
+          <th>Depth</th>
+          <th>Failure</th>
+          <th>Length</th>
+          <th>Connector</th>
+          <th>Unit</th>
+        </tr>
+      </thead>
+    {% for item in imported %}
+      <tr>
+        <td>{{ item.name }}</td>
+        <td>{{ item.brand }}</td>
+        <td>{{ item.model }}</td>
+        <td>{{ item.serial_number }}</td>
+        <td>{{ item.item_type }}</td>
+        <td>{{ item.weight }}</td>
+        <td>{{ item.width }}</td>
+        <td>{{ item.height }}</td>
+        <td>{{ item.depth }}</td>
+        <td>{{ item.failure }}</td>
+        <td>{{ item.length }}</td>
+        <td>{{ item.connector }}</td>
+        <td>{{ item.unit }}</td>
+      </tr>
+    {% endfor %}
+    </table>
+  {% endif %}
+</div>
+
+{% endblock %}

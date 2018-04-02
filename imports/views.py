@@ -7,6 +7,8 @@ from avdb.models import \
     Convention, \
     Equipment, \
     EquipmentType, \
+    Item, \
+    ItemType, \
     Language, \
     Location, \
     LocationType, \
@@ -15,7 +17,7 @@ from avdb.models import \
 from .forms import ImportCSVFileForm
 
 import csv
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 import logging
 logger = logging.getLogger(__name__)
 
@@ -490,6 +492,134 @@ def handle_units_file(f):
             )
             unit.save()
             imported.append(unit)
+        else:
+            failed.append(row)
+
+    return (None, imported, failed)
+
+# -----
+# ITEMS
+# -----
+
+item_columns = ['Item name', 'Brand', 'Model', 'Serial number', 'Type', 'Weight', 'Width', 'Height', 'Depth', 'Failure', 'Length', 'Connector', 'Unit']
+
+def import_items(request):
+    error = None
+    imported = []
+    failed = []
+    if request.method == 'POST':
+        form = ImportCSVFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            error, imported, failed = handle_items_file(request.FILES['file'])
+    else:
+        # show blank form
+        form = ImportCSVFileForm()
+
+    return render(request, 'imports/import_items.html', {
+        'form': form,
+        'error': error,
+        'imported': imported,
+        'failed': failed
+    })
+
+def handle_items_file(f):
+    try:
+        reader = get_csv_reader(f)
+    except UnicodeDecodeError:
+        return ('Invalid CSV file. Make sure CSV is in UTF-8 format.', [], [])
+
+    imported = []
+    failed = []
+
+    first_row = True
+    for row in reader:
+
+        row = convert_row(row)
+
+        if first_row and not header_row_is_valid(row, item_columns):
+            return ('Invalid conventions CSV data. Header must be "%s"' % csv_delimiter.join(item_columns), [], [])
+
+        if first_row:
+            first_row = False
+            continue
+
+        error = False
+
+        try:
+            item_type = ItemType.objects.get(name=row[4]['val'])
+        except InvalidOperation:
+            row[4]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            weight = None
+            if row[5]['val'] != '':
+                weight = int(row[5]['val'])
+        except ValueError:
+            row[5]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            width = None
+            if row[6]['val'] != '':
+                width = int(row[6]['val'])
+        except ValueError:
+            row[6]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            height = None
+            if row[7]['val'] != '':
+                height = int(row[7]['val'])
+        except ValueError:
+            row[7]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            depth = None
+            if row[8]['val'] != '':
+                depth = int(row[8]['val'])
+        except ValueError:
+            row[8]['error'] = 'Invalid value'
+            error = True
+
+        failure = row[9]['val'] != ''
+
+        try:
+            length = None
+            if row[10]['val'] != '':
+                depth = int(row[10]['val'])
+        except ValueError:
+            row[10]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            unit = None
+            if row[12]['val'] != '':
+                unit = Unit.objects.get(name=row[12]['val'])
+        except ObjectDoesNotExist:
+            row[12]['error'] = 'Invalid value'
+            error = True
+
+        if not error:
+            # import item row
+            item = Item(
+                name=row[0]['val'],
+                brand=row[1]['val'],
+                model=row[2]['val'],
+                serial_number=row[3]['val'],
+                item_type=item_type,
+                weight=weight,
+                width=width,
+                height=height,
+                depth=depth,
+                failure=failure,
+                length=length,
+                connector=row[11]['val'],
+                unit=unit,
+            )
+            item.save()
+            imported.append(item)
         else:
             failed.append(row)
 

@@ -282,7 +282,7 @@ class Unit(models.Model):
         if self.included_in is not None:
             # update parent unit weight
             self.included_in.update_weight()
-        else:
+        elif self.equipment is not None:
             # no parent unit, update equipment gross weight
             self.equipment.update_gross_weight()
 
