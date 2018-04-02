@@ -9,10 +9,13 @@ from avdb.models import \
     EquipmentType, \
     Language, \
     Location, \
-    LocationType
+    LocationType, \
+    Unit, \
+    UnitType
 from .forms import ImportCSVFileForm
 
 import csv
+from decimal import Decimal
 import logging
 logger = logging.getLogger(__name__)
 
@@ -332,6 +335,161 @@ def handle_equipments_file(f):
             )
             equipment.save()
             imported.append(equipment)
+        else:
+            failed.append(row)
+
+    return (None, imported, failed)
+
+# -----
+# UNITS
+# -----
+
+unit_columns = ['Unit name', 'Equipment', 'Footprint', 'Pallet space', 'Type', 'Dead weight', 'Net weight', 'Gross weight', 'Width', 'Height', 'Depth', 'Built in items', 'Included in']
+
+def import_units(request):
+    error = None
+    imported = []
+    failed = []
+    if request.method == 'POST':
+        form = ImportCSVFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            error, imported, failed = handle_units_file(request.FILES['file'])
+    else:
+        # show blank form
+        form = ImportCSVFileForm()
+
+    return render(request, 'imports/import_units.html', {
+        'form': form,
+        'error': error,
+        'imported': imported,
+        'failed': failed
+    })
+
+def handle_units_file(f):
+    try:
+        reader = get_csv_reader(f)
+    except UnicodeDecodeError:
+        return ('Invalid CSV file. Make sure CSV is in UTF-8 format.', [], [])
+
+    imported = []
+    failed = []
+
+    first_row = True
+    for row in reader:
+
+        row = convert_row(row)
+
+        if first_row and not header_row_is_valid(row, unit_columns):
+            return ('Invalid conventions CSV data. Header must be "%s"' % csv_delimiter.join(unit_columns), [], [])
+
+        if first_row:
+            first_row = False
+            continue
+
+        error = False
+
+        equipment = Equipment.objects.filter(name=row[1]['val']).first()
+        if equipment is None:
+            row[1]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            footprint = None
+            if row[2]['val'] != '':
+                footprint = Decimal(row[2]['val'])
+        except InvalidOperation:
+            row[2]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            pallet_space = None
+            if row[3]['val'] != '':
+                pallet_space = Decimal(row[3]['val'])
+        except InvalidOperation:
+            row[3]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            dead_weight = None
+            if row[5]['val'] != '':
+                dead_weight = int(row[5]['val'])
+        except ValueError:
+            row[5]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            net_weight = None
+            if row[6]['val'] != '':
+                net_weight = int(row[6]['val'])
+        except ValueError:
+            row[6]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            gross_weight = None
+            if row[7]['val'] != '':
+                gross_weight = int(row[7]['val'])
+        except ValueError:
+            row[7]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            width = None
+            if row[8]['val'] != '':
+                width = int(row[8]['val'])
+        except ValueError:
+            row[8]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            height = None
+            if row[9]['val'] != '':
+                height = int(row[9]['val'])
+        except ValueError:
+            row[9]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            depth = None
+            if row[10]['val'] != '':
+                depth = int(row[10]['val'])
+        except ValueError:
+            row[10]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            unit_type = UnitType.objects.get(name=row[4]['val'])
+        except ObjectDoesNotExist:
+            row[4]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            included_in = None
+            if row[12]['val'] != '':
+                included_in = Unit.objects.get(name=row[12]['val'])
+        except ObjectDoesNotExist:
+            row[12]['error'] = 'Invalid value'
+            error = True
+
+        if not error:
+            # import unit row
+            unit = Unit(
+                name=row[0]['val'],
+                equipment=equipment,
+                footprint=footprint,
+                pallet_space=pallet_space,
+                unit_type=unit_type,
+                dead_weight=dead_weight,
+                net_weight=net_weight,
+                gross_weight=gross_weight,
+                width=width,
+                height=height,
+                depth=depth,
+                built_in_items=row[11]['val'],
+                included_in=included_in,
+            )
+            unit.save()
+            imported.append(unit)
         else:
             failed.append(row)
 

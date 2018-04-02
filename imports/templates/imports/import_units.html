@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<div class="container">
+  <h1 style="margin-top: 50px; margin-bottom: 25px;">
+    <i class="fas fa-upload"></i>
+    Import Units From CSV File</h1>
+
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Example data</h5>
+      <pre><code>Unit name;Equipment;Footprint;Pallet space;Type;Dead weight;Net weight;Gross weight;Width;Height;Depth;Built in items;Included in
+LED FI-1 1/10;5x3 LED FI-1;;;Wheeled case;34;22;56;;;;;;</code></pre>
+    </div>
+  </div>
+
+  <form action="{% url 'import_units' %}" method="post" enctype="multipart/form-data" style="margin-top: 25px;">
+    {% csrf_token %}
+    {{ form }}
+    <div class="form-group" style="margin-top: 25px; margin-bottom: 50px;">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-upload"></i>
+        Import units
+      </button>
+    </div>
+  </form>
+
+  {% if error %}
+    <h3 class="text-danger">
+      <i class="fas fa-times"></i>
+      Error</h3>
+    <p>{{ error }}</p>
+  {% endif %}
+
+  {% if failed %}
+    <h3 class="text-danger">
+      <i class="fas fa-times"></i>
+      {{ failed|length }} rows failed</h3>
+
+    <table class="table table-sm">
+      <thead>
+        <tr class="table-danger">
+          <th>Unit name</th>
+          <th>Equipment</th>
+          <th>Footprint</th>
+          <th>Pallet space</th>
+          <th>Type</th>
+          <th>Dead weight</th>
+          <th>Net weight</th>
+          <th>Gross weight</th>
+          <th>Width</th>
+          <th>Height</th>
+          <th>Depth</th>
+          <th>Built in items</th>
+          <th>Included in</th>
+        </tr>
+      </thead>
+    {% for row in failed %}
+      <tr>
+        <td class="{% if row.0.error %}text-danger{% endif %}">{{ row.0.val }}</td>
+        <td class="{% if row.1.error %}text-danger{% endif %}">{{ row.1.val }}</td>
+        <td class="{% if row.2.error %}text-danger{% endif %}">{{ row.2.val }}</td>
+        <td class="{% if row.3.error %}text-danger{% endif %}">{{ row.3.val }}</td>
+        <td class="{% if row.4.error %}text-danger{% endif %}">{{ row.4.val }}</td>
+        <td class="{% if row.5.error %}text-danger{% endif %}">{{ row.5.val }}</td>
+        <td class="{% if row.6.error %}text-danger{% endif %}">{{ row.6.val }}</td>
+        <td class="{% if row.7.error %}text-danger{% endif %}">{{ row.7.val }}</td>
+        <td class="{% if row.8.error %}text-danger{% endif %}">{{ row.8.val }}</td>
+        <td class="{% if row.9.error %}text-danger{% endif %}">{{ row.9.val }}</td>
+        <td class="{% if row.10.error %}text-danger{% endif %}">{{ row.10.val }}</td>
+        <td class="{% if row.11.error %}text-danger{% endif %}">{{ row.11.val }}</td>
+        <td class="{% if row.12.error %}text-danger{% endif %}">{{ row.12.val }}</td>
+      </tr>
+    {% endfor %}
+    </table>
+  {% endif %}
+
+  {% if imported %}
+    <h3>
+      <i class="fas fa-check"></i>
+      {{ imported|length }} units imported</h3>
+
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th>Unit name</th>
+          <th>Equipment</th>
+          <th>Footprint</th>
+          <th>Pallet space</th>
+          <th>Type</th>
+          <th>Dead weight</th>
+          <th>Net weight</th>
+          <th>Gross weight</th>
+          <th>Width</th>
+          <th>Height</th>
+          <th>Depth</th>
+          <th>Built in items</th>
+          <th>Included in</th>
+        </tr>
+      </thead>
+    {% for unit in imported %}
+      <tr>
+        <td>{{ unit.name }}</td>
+        <td>{{ unit.equipment }}</td>
+        <td>{{ unit.footprint }}</td>
+        <td>{{ unit.pallet_space }}</td>
+        <td>{{ unit.unit_type }}</td>
+        <td>{{ unit.dead_weight }}</td>
+        <td>{{ unit.net_weight }}</td>
+        <td>{{ unit.gross_weight }}</td>
+        <td>{{ unit.width }}</td>
+        <td>{{ unit.height }}</td>
+        <td>{{ unit.depth }}</td>
+        <td>{{ unit.built_in_items }}</td>
+        <td>{{ unit.included_in }}</td>
+      </tr>
+    {% endfor %}
+    </table>
+  {% endif %}
+</div>
+
+{% endblock %}
