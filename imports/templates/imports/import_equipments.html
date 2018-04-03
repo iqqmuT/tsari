@@ -10,8 +10,8 @@
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">Example data</h5>
-      <pre><code>Equipment name;Type;Footprint;Pallet space;Gross weight
-5x3 LED FI-1;Video;3.42;6;56</code></pre>
+      <pre><code>Equipment name;Type;Footprint;Pallet space
+5x3 LED FI-1;Video;3.42;6</code></pre>
     </div>
   </div>
 
@@ -45,7 +45,6 @@
           <th>Type</th>
           <th>Footprint</th>
           <th>Pallet space</th>
-          <th>Gross weight</th>
         </tr>
       </thead>
     {% for row in failed %}
@@ -54,7 +53,6 @@
         <td class="{% if row.1.error %}text-danger{% endif %}">{{ row.1.val }}</td>
         <td class="{% if row.2.error %}text-danger{% endif %}">{{ row.2.val }}</td>
         <td class="{% if row.3.error %}text-danger{% endif %}">{{ row.3.val }}</td>
-        <td class="{% if row.4.error %}text-danger{% endif %}">{{ row.4.val }}</td>
       </tr>
     {% endfor %}
     </table>
@@ -72,7 +70,6 @@
           <th>Type</th>
           <th>Footprint</th>
           <th>Pallet space</th>
-          <th>Gross weight</th>
         </tr>
       </thead>
     {% for eq in imported %}
@@ -81,7 +78,6 @@
         <td>{{ eq.equipment_type }}</td>
         <td>{{ eq.footprint }}</td>
         <td>{{ eq.pallet_space }}</td>
-        <td>{{ eq.gross_weight }}</td>
       </tr>
     {% endfor %}
     </table>
