@@ -282,7 +282,7 @@ def handle_contact_persons_file(f):
 # EQUIPMENTS
 # ----------
 
-equipment_columns = ['Name', 'Type', 'Footprint', 'Pallet space']
+equipment_columns = ['Name', 'Type', 'Footprint', 'Pallet space', 'Space calculated']
 
 @user_passes_test(lambda u: u.is_superuser)
 def import_equipments(request):
@@ -333,13 +333,32 @@ def handle_equipments_file(f):
             row[1]['error'] = 'Invalid value'
             error = True
 
+        try:
+            footprint = None
+            if row[2]['val'] != '':
+                footprint = Decimal(row[2]['val'])
+        except InvalidOperation:
+            row[2]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            pallet_space = None
+            if row[3]['val'] != '':
+                pallet_space = Decimal(row[3]['val'])
+        except InvalidOperation:
+            row[3]['error'] = 'Invalid value'
+            error = True
+
+        space_calculated = row[4]['val'] != ''
+
         if not error:
             # import equipment row
             equipment = Equipment(
                 name=row[0]['val'],
                 equipment_type=equipment_type,
-                footprint=row[2]['val'],
-                pallet_space=row[3]['val'],
+                footprint=footprint,
+                pallet_space=pallet_space,
+                space_calculated=space_calculated,
             )
             equipment.save()
             imported.append(equipment)
