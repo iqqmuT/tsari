@@ -282,7 +282,7 @@ def handle_contact_persons_file(f):
 # EQUIPMENTS
 # ----------
 
-equipment_columns = ['Equipment name', 'Type', 'Footprint', 'Pallet space', 'Gross weight']
+equipment_columns = ['Name', 'Type', 'Footprint', 'Pallet space']
 
 @user_passes_test(lambda u: u.is_superuser)
 def import_equipments(request):
@@ -340,7 +340,6 @@ def handle_equipments_file(f):
                 equipment_type=equipment_type,
                 footprint=row[2]['val'],
                 pallet_space=row[3]['val'],
-                gross_weight=row[4]['val'],
             )
             equipment.save()
             imported.append(equipment)
@@ -353,7 +352,7 @@ def handle_equipments_file(f):
 # UNITS
 # -----
 
-unit_columns = ['Unit name', 'Equipment', 'Footprint', 'Pallet space', 'Type', 'Dead weight', 'Net weight', 'Gross weight', 'Width', 'Height', 'Depth', 'Built in items', 'Included in']
+unit_columns = ['Name', 'Equipment', 'Footprint', 'Pallet space', 'Type', 'Dead weight', 'Net weight', 'Gross weight', 'Width', 'Height', 'Depth', 'Built in items', 'Included in']
 
 @user_passes_test(lambda u: u.is_superuser)
 def import_units(request):
@@ -509,7 +508,7 @@ def handle_units_file(f):
 # ITEMS
 # -----
 
-item_columns = ['Item name', 'Brand', 'Model', 'Serial number', 'Type', 'Weight', 'Width', 'Height', 'Depth', 'Failure', 'Length', 'Connector', 'Unit']
+item_columns = ['Name', 'Brand', 'Model', 'Serial number', 'Type', 'Weight', 'Width', 'Height', 'Depth', 'Failure', 'Length', 'Connector', 'Unit']
 
 @user_passes_test(lambda u: u.is_superuser)
 def import_items(request):
