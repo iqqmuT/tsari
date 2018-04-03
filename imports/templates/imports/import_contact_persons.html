@@ -10,8 +10,8 @@
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">Example data</h5>
-      <pre><code>Contact name;Phone;Email;Convention
-John Doe;+12345678;john@doe.com;Helsinki</code></pre>
+      <pre><code>Name;Phone;Email
+John Doe;+12345678;john@doe.com</code></pre>
     </div>
   </div>
 
@@ -44,7 +44,6 @@ John Doe;+12345678;john@doe.com;Helsinki</code></pre>
           <th>Contact name</th>
           <th>Phone</th>
           <th>Email</th>
-          <th>Convention</th>
         </tr>
       </thead>
     {% for row in failed %}
@@ -52,7 +51,6 @@ John Doe;+12345678;john@doe.com;Helsinki</code></pre>
         <td class="{% if row.0.error %}text-danger{% endif %}">{{ row.0.val }}</td>
         <td class="{% if row.1.error %}text-danger{% endif %}">{{ row.1.val }}</td>
         <td class="{% if row.2.error %}text-danger{% endif %}">{{ row.2.val }}</td>
-        <td class="{% if row.3.error %}text-danger{% endif %}">{{ row.3.val }}</td>
       </tr>
     {% endfor %}
     </table>
@@ -61,15 +59,14 @@ John Doe;+12345678;john@doe.com;Helsinki</code></pre>
   {% if imported %}
     <h3>
       <i class="fas fa-check"></i>
-      {{ imported|length }} locations imported</h3>
+      {{ imported|length }} contact persons imported</h3>
 
     <table class="table table-sm">
       <thead>
         <tr>
-          <th>Contact name</th>
+          <th>Name</th>
           <th>Phone</th>
           <th>Email</th>
-          <th>Convention</th>
         </tr>
       </thead>
     {% for person in imported %}
@@ -77,7 +74,6 @@ John Doe;+12345678;john@doe.com;Helsinki</code></pre>
         <td>{{ person.name }}</td>
         <td>{{ person.phone }}</td>
         <td>{{ person.email }}</td>
-        <td>{{ person.convention }}</td>
       </tr>
     {% endfor %}
     </table>

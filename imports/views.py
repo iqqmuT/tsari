@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
@@ -25,12 +26,17 @@ logger = logging.getLogger(__name__)
 csv_delimiter = ';'
 csv_quotechar = '"'
 
+@user_passes_test(lambda u: u.is_superuser)
+def index(request):
+    return render(request, 'imports/index.html')
+
 # ---------
 # LOCATIONS
 # ---------
 
-location_columns = ['Location name', 'Address', 'Location type', 'Abbreviation']
+location_columns = ['Name', 'Address', 'Entrance', 'Loc type', 'Abbreviation']
 
+@user_passes_test(lambda u: u.is_superuser)
 def import_locations(request):
     error = None
     imported = []
@@ -64,48 +70,40 @@ def handle_locations_file(f):
         row = convert_row(row)
 
         if first_row and not header_row_is_valid(row, location_columns):
-            return ('Invalid locations CSV data. Header must be "%s"' % csv_delimiter.join(location_columns), [], [])
+            logger.error(row)
+            return ('Invalid koo locations CSV data. Header must be "%s"' % csv_delimiter.join(location_columns), [], [])
 
         if first_row:
             first_row = False
             continue
 
         try:
-            loc_type = LocationType.objects.get(name=row[2]['val'])
+            loc_type = LocationType.objects.get(pk=row[3]['val'])
             if loc_type is not None:
                 # import location row
                 location = Location(
                     name=row[0]['val'],
                     address=row[1]['val'],
+                    entrance=row[2]['val'],
                     loc_type=loc_type,
-                    abbreviation=row[3]['val'],
+                    abbreviation=row[4]['val'],
                 )
                 location.save()
                 imported.append(location)
 
         except ObjectDoesNotExist:
-            row[2]['error'] = 'Invalid value'
+            row[3]['error'] = 'Invalid value'
             failed.append(row)
 
     return (None, imported, failed)
-
-def header_row_is_valid(row, columns):
-    """Returns true if given row matches defined columns."""
-    if len(row) != len(columns):
-        return False
-
-    for i in range(0, len(row)):
-        if row[i]['val'] != columns[i]:
-            return False
-
-    return True
 
 # -----------
 # CONVENTIONS
 # -----------
 
-convention_columns = ['Convention name', 'Language', 'Starts', 'Ends', 'Load in', 'Load out', 'Location']
+convention_columns = ['Name', 'Lang', 'Starts', 'Ends', 'Load in', 'Load out', 'Location', 'Contact person']
 
+@user_passes_test(lambda u: u.is_superuser)
 def import_conventions(request):
     error = None
     imported = []
@@ -149,39 +147,55 @@ def handle_conventions_file(f):
         error = False
 
         try:
-            language = Language.objects.get(code=row[1]['val'])
+            language = Language.objects.get(pk=row[1]['val'])
         except ObjectDoesNotExist:
             row[1]['error'] = 'Invalid value'
             error = True
 
         try:
-            starts = handle_date(row[2]['val'])
+            starts = None
+            if row[2]['val'] != '':
+                starts = handle_date(row[2]['val'])
         except TypeError:
             row[2]['error'] = 'Invalid value'
             error = True
 
         try:
-            ends = handle_date(row[3]['val'])
+            ends = None
+            if row[3]['val'] != '':
+                ends = handle_date(row[3]['val'])
         except TypeError:
             row[3]['error'] = 'Invalid value'
             error = True
 
         try:
-            load_in = handle_datetime(row[4]['val'])
+            load_in = None
+            if row[4]['val'] != '':
+                load_in = handle_datetime(row[4]['val'])
         except TypeError:
             row[4]['error'] = 'Invalid value'
             error = True
 
         try:
-            load_out = handle_datetime(row[5]['val'])
+            load_out = None
+            if row[5]['val'] != '':
+                load_out = handle_datetime(row[5]['val'])
         except TypeError:
             row[5]['error'] = 'Invalid value'
             error = True
 
-        # get location by abbreviation
-        location = Location.objects.filter(abbreviation=row[6]['val']).first()
-        if location is None:
+        try:
+            location = Location.objects.get(pk=row[6]['val'])
+        except ObjectDoesNotExist:
             row[6]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            contact_person = None
+            if row[7]['val'] != '':
+                contact_person = ContactPerson.objects.get(pk=row[7]['val'])
+        except ObjectDoesNotExist:
+            row[7]['error'] = 'Invalid value'
             error = True
 
         if not error:
@@ -194,6 +208,7 @@ def handle_conventions_file(f):
                 load_in=load_in,
                 load_out=load_out,
                 location=location,
+                contact_person=contact_person,
             )
             convention.save()
             imported.append(convention)
@@ -207,8 +222,9 @@ def handle_conventions_file(f):
 # CONTACT PERSONS
 # ---------------
 
-contact_person_columns = ['Contact name', 'Phone', 'Email', 'Convention']
+contact_person_columns = ['Name', 'Phone', 'Email']
 
+@user_passes_test(lambda u: u.is_superuser)
 def import_contact_persons(request):
     error = None
     imported = []
@@ -249,25 +265,15 @@ def handle_contact_persons_file(f):
             first_row = False
             continue
 
-        error = False
-
-        convention = Convention.objects.filter(name=row[3]['val']).first()
-        if convention is None:
-            row[3]['error'] = 'Invalid value'
-            error = True
-
-        if not error:
-            # import convention row
-            person = ContactPerson(
-                name=row[0]['val'],
-                phone=row[1]['val'],
-                email=row[2]['val'],
-                convention=convention,
-            )
-            person.save()
-            imported.append(person)
-        else:
-            failed.append(row)
+        logger.error(row)
+        # import convention row
+        person = ContactPerson(
+            name=row[0]['val'],
+            phone=row[1]['val'],
+            email=row[2]['val'],
+        )
+        person.save()
+        imported.append(person)
 
     return (None, imported, failed)
 
@@ -278,6 +284,7 @@ def handle_contact_persons_file(f):
 
 equipment_columns = ['Equipment name', 'Type', 'Footprint', 'Pallet space', 'Gross weight']
 
+@user_passes_test(lambda u: u.is_superuser)
 def import_equipments(request):
     error = None
     imported = []
@@ -348,6 +355,7 @@ def handle_equipments_file(f):
 
 unit_columns = ['Unit name', 'Equipment', 'Footprint', 'Pallet space', 'Type', 'Dead weight', 'Net weight', 'Gross weight', 'Width', 'Height', 'Depth', 'Built in items', 'Included in']
 
+@user_passes_test(lambda u: u.is_superuser)
 def import_units(request):
     error = None
     imported = []
@@ -503,6 +511,7 @@ def handle_units_file(f):
 
 item_columns = ['Item name', 'Brand', 'Model', 'Serial number', 'Type', 'Weight', 'Width', 'Height', 'Depth', 'Failure', 'Length', 'Connector', 'Unit']
 
+@user_passes_test(lambda u: u.is_superuser)
 def import_items(request):
     error = None
     imported = []
@@ -640,6 +649,22 @@ def convert_row(values):
     for val in values:
         row.append({ 'val': val, 'error': None })
     return row
+
+def header_row_is_valid(row, columns):
+    """Returns true if given row matches defined columns."""
+
+    # skip BOM UTF-8 character inserted by Excel
+    if row[0]['val'][0] == u'\ufeff':
+        row[0]['val'] = row[0]['val'][1:]
+
+    if len(row) != len(columns):
+        return False
+
+    for i in range(0, len(row)):
+        if row[i]['val'] != columns[i]:
+            return False
+
+    return True
 
 def handle_date(s):
     if s is None:

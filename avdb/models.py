@@ -216,7 +216,6 @@ class Unit(models.Model):
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)
     depth = models.IntegerField(null=True, blank=True)
-    built_in_items = models.CharField(max_length=256, blank=True)
     # parent unit
     included_in = models.ForeignKey(
         'self',
@@ -225,6 +224,7 @@ class Unit(models.Model):
         on_delete=models.CASCADE,
         related_name='includes',
     )
+    qrid = models.CharField(max_length=64, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -312,25 +312,40 @@ class ItemType(models.Model):
     class Meta:
         ordering = ['name']
 
-class Item(models.Model):
+class ItemClass(models.Model):
     name = models.CharField(max_length=256)
     brand = models.CharField(max_length=128, blank=True)
     model = models.CharField(max_length=128, blank=True)
-    serial_number = models.CharField(max_length=64, blank=True)
     item_type = models.ForeignKey(ItemType, on_delete=models.CASCADE)
     weight = models.IntegerField(null=True, blank=True)
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)
     depth = models.IntegerField(null=True, blank=True)
-    failure = models.BooleanField(default=False)
     length = models.IntegerField(null=True, blank=True)
     connector = models.CharField(max_length=128, blank=True)
-    unit = models.ForeignKey(Unit, null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ['name']
+
+class Item(models.Model):
+    item_class = models.ForeignKey(ItemClass, on_delete=models.CASCADE)
+    serial_number = models.CharField(max_length=64, blank=True)
+    failure = models.BooleanField(default=False)
+    unit = models.ForeignKey(Unit, null=True, on_delete=models.SET_NULL)
+    built_in_unit = models.BooleanField(default=False)
+    qrid = models.CharField(max_length=64, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        if self.serial_number != "":
+            return "%s - %s" % (self.item_class.name, self.serial_number)
+        return self.item_class.name
 
     def save(self, *args, **kwargs):
         # Calling the real save() method
@@ -341,7 +356,7 @@ class Item(models.Model):
             self.unit.update_weight()
 
     class Meta:
-        ordering = ['name']
+        ordering = ['item_class__name', 'serial_number']
 
 class ItemFailure(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)

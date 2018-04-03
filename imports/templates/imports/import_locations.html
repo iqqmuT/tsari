@@ -10,9 +10,8 @@
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">Example data</h5>
-      <pre><code>Location name;Address;Location type;Abbreviation
-Ice Hockey Hall;Street 1, 00100 City;Convention venue;ICE
-Branch Depot;Street 2, 00020 Town;Bethel;BRA</code></pre>
+      <pre><code>Name;Address;Entrance;Loc type;Abbreviation
+Tampere Exhibition and Sports Centre;Ilmailunkatu 20, 33900 Tampere, Finland;Service Entrance A8;1;TRE</code></pre>
     </div>
   </div>
 
@@ -42,9 +41,10 @@ Branch Depot;Street 2, 00020 Town;Bethel;BRA</code></pre>
     <table class="table table-sm">
       <thead>
         <tr class="table-danger">
-          <th>Location name</th>
+          <th>Name</th>
           <th>Address</th>
-          <th>Location type</th>
+          <th>Entrance</th>
+          <th>Loc type</th>
           <th>Abbreviation</th>
         </tr>
       </thead>
@@ -54,6 +54,7 @@ Branch Depot;Street 2, 00020 Town;Bethel;BRA</code></pre>
         <td class="{% if row.1.error %}text-danger{% endif %}">{{ row.1.val }}</td>
         <td class="{% if row.2.error %}text-danger{% endif %}">{{ row.2.val }}</td>
         <td class="{% if row.3.error %}text-danger{% endif %}">{{ row.3.val }}</td>
+        <td class="{% if row.4.error %}text-danger{% endif %}">{{ row.4.val }}</td>
       </tr>
     {% endfor %}
     </table>
@@ -67,16 +68,18 @@ Branch Depot;Street 2, 00020 Town;Bethel;BRA</code></pre>
     <table class="table table-sm">
       <thead>
         <tr>
-          <th>Location name</th>
+          <th>Name</th>
           <th>Address</th>
-          <th>Location type</th>
+          <th>Entrance</th>
+          <th>Loc type</th>
           <th>Abbreviation</th>
         </tr>
       </thead>
     {% for location in imported %}
       <tr>
-        <td>{{ location }}</td>
+        <td>{{ location.name }}</td>
         <td>{{ location.address }}</td>
+        <td>{{ location.entrance }}</td>
         <td>{{ location.loc_type }}</td>
         <td>{{ location.abbreviation }}</td>
       </tr>

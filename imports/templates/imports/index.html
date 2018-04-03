@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<div class="container">
+  <h1 style="margin-top: 25px; margin-bottom: 50px;">CSV Import</h1>
+
+  <div class="row">
+    <div class="col-4">
+      <a href="{% url 'import_locations' %}" class="btn btn-outline-dark">Locations</a>
+    </div>
+    <div class="col-4">
+      <a href="{% url 'import_contact_persons' %}" class="btn btn-outline-dark">Contact Persons</a>
+    </div>
+    <div class="col-4">
+      <a href="{% url 'import_conventions' %}" class="btn btn-outline-dark">Conventions</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
