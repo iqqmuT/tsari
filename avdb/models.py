@@ -315,7 +315,7 @@ class ItemType(models.Model):
         ordering = ['name']
 
 class ItemClass(models.Model):
-    name = models.CharField(max_length=256)
+    description = models.CharField(max_length=256)
     brand = models.CharField(max_length=128, blank=True)
     model = models.CharField(max_length=128, blank=True)
     item_type = models.ForeignKey(ItemType, on_delete=models.CASCADE)
@@ -329,13 +329,15 @@ class ItemClass(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return "%d - %s" % (self.id, self.description)
 
     class Meta:
-        ordering = ['name']
+        ordering = ['description']
+        verbose_name_plural = 'Item classes'
 
 class Item(models.Model):
     item_class = models.ForeignKey(ItemClass, on_delete=models.CASCADE)
+    name = models.CharField(max_length=256)
     serial_number = models.CharField(max_length=64, blank=True)
     failure = models.BooleanField(default=False)
     unit = models.ForeignKey(Unit, null=True, on_delete=models.SET_NULL)
@@ -358,7 +360,7 @@ class Item(models.Model):
             self.unit.update_weight()
 
     class Meta:
-        ordering = ['item_class__name', 'serial_number']
+        ordering = ['name', 'serial_number']
 
 class ItemFailure(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
@@ -370,6 +372,18 @@ class ItemFailure(models.Model):
     class Meta:
         ordering = ['created']
 
+class Attachment(models.Model):
+    item = models.ForeignKey(Item, null=True, on_delete=models.CASCADE)
+    item_class = models.ForeignKey(ItemClass, null=True, on_delete=models.CASCADE)
+    unit = models.ForeignKey(Unit, null=True, on_delete=models.CASCADE)
+    equipment = models.ForeignKey(Equipment, null=True, on_delete=models.CASCADE)
+    file = models.FileField(upload_to='uploads/')
+    mime_type = models.CharField(max_length=64)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['created']
 
 # Status models
 

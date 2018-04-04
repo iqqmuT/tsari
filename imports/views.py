@@ -8,6 +8,7 @@ from avdb.models import \
     Convention, \
     Equipment, \
     EquipmentType, \
+    ItemClass, \
     Item, \
     ItemType, \
     Language, \
@@ -372,7 +373,7 @@ def handle_equipments_file(f):
 # UNITS
 # -----
 
-unit_columns = ['Name', 'Equipment', 'Footprint', 'Pallet space', 'Type', 'Dead weight', 'Net weight', 'Gross weight', 'Width', 'Height', 'Depth', 'Built in items', 'Included in']
+unit_columns = ['Name', 'Equipment', 'Footprint', 'Pallet space', 'Equipment type', 'Dead weight', 'Net weight', 'Gross weight', 'Width', 'Height', 'Depth', 'Included in']
 
 @user_passes_test(lambda u: u.is_superuser)
 def import_units(request):
@@ -514,7 +515,6 @@ def handle_units_file(f):
                 width=width,
                 height=height,
                 depth=depth,
-                built_in_items=row[11]['val'],
                 included_in=included_in,
             )
             unit.save()
@@ -524,11 +524,133 @@ def handle_units_file(f):
 
     return (None, imported, failed)
 
+# ------------
+# ITEM CLASSES
+# ------------
+
+item_class_columns = ['Description', 'Brand', 'Model', 'Item type', 'Weight', 'Width', 'Height', 'Depth', 'Length', 'Connector']
+
+@user_passes_test(lambda u: u.is_superuser)
+def import_item_classes(request):
+    error = None
+    imported = []
+    failed = []
+    if request.method == 'POST':
+        form = ImportCSVFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            error, imported, failed = handle_item_classes_file(request.FILES['file'])
+    else:
+        # show blank form
+        form = ImportCSVFileForm()
+
+    return render(request, 'imports/import_item_classes.html', {
+        'form': form,
+        'error': error,
+        'imported': imported,
+        'failed': failed
+    })
+
+def handle_item_classes_file(f):
+    try:
+        reader = get_csv_reader(f)
+    except UnicodeDecodeError:
+        return ('Invalid CSV file. Make sure CSV is in UTF-8 format.', [], [])
+
+    imported = []
+    failed = []
+
+    first_row = True
+    for row in reader:
+
+        row = convert_row(row)
+
+        if first_row and not header_row_is_valid(row, item_columns):
+            return ('Invalid conventions CSV data. Header must be "%s"' % csv_delimiter.join(item_columns), [], [])
+
+        if first_row:
+            first_row = False
+            continue
+
+        error = False
+
+        try:
+            item_type = ItemType.objects.get(name=row[3]['val'])
+        except InvalidOperation:
+            row[3]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            i = 4
+            weight = None
+            if row[i]['val'] != '':
+                weight = int(row[i]['val'])
+        except ValueError:
+            row[i]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            i = 5
+            width = None
+            if row[i]['val'] != '':
+                width = int(row[i]['val'])
+        except ValueError:
+            row[i]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            i = 6
+            height = None
+            if row[i]['val'] != '':
+                height = int(row[i]['val'])
+        except ValueError:
+            row[i]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            i = 7
+            depth = None
+            if row[i]['val'] != '':
+                depth = int(row[i]['val'])
+        except ValueError:
+            row[i]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            i = 8
+            length = None
+            if row[i]['val'] != '':
+                depth = int(row[i]['val'])
+        except ValueError:
+            row[i]['error'] = 'Invalid value'
+            error = True
+
+        if not error:
+            # import item row
+            ic = ItemClass(
+                description=row[0]['val'],
+                brand=row[1]['val'],
+                model=row[2]['val'],
+                item_type=item_type,
+                weight=weight,
+                width=width,
+                height=height,
+                depth=depth,
+                length=length,
+                connector=row[9]['val'],
+            )
+            ic.save()
+            imported.append(ic)
+        else:
+            failed.append(row)
+
+    return (None, imported, failed)
+
+
 # -----
 # ITEMS
 # -----
 
-item_columns = ['Name', 'Brand', 'Model', 'Serial number', 'Type', 'Weight', 'Width', 'Height', 'Depth', 'Failure', 'Length', 'Connector', 'Unit']
+item_columns = ['Item class', 'Name', 'Serial number', 'Unit', 'Built in unit', 'Qrid']
 
 @user_passes_test(lambda u: u.is_superuser)
 def import_items(request):
@@ -574,77 +696,30 @@ def handle_items_file(f):
         error = False
 
         try:
-            item_type = ItemType.objects.get(name=row[4]['val'])
+            item_class = ItemClass.objects.get(name=row[0]['val'])
         except InvalidOperation:
-            row[4]['error'] = 'Invalid value'
+            row[0]['error'] = 'Invalid value'
             error = True
 
-        try:
-            weight = None
-            if row[5]['val'] != '':
-                weight = int(row[5]['val'])
-        except ValueError:
-            row[5]['error'] = 'Invalid value'
-            error = True
-
-        try:
-            width = None
-            if row[6]['val'] != '':
-                width = int(row[6]['val'])
-        except ValueError:
-            row[6]['error'] = 'Invalid value'
-            error = True
-
-        try:
-            height = None
-            if row[7]['val'] != '':
-                height = int(row[7]['val'])
-        except ValueError:
-            row[7]['error'] = 'Invalid value'
-            error = True
-
-        try:
-            depth = None
-            if row[8]['val'] != '':
-                depth = int(row[8]['val'])
-        except ValueError:
-            row[8]['error'] = 'Invalid value'
-            error = True
-
-        failure = row[9]['val'] != ''
-
-        try:
-            length = None
-            if row[10]['val'] != '':
-                depth = int(row[10]['val'])
-        except ValueError:
-            row[10]['error'] = 'Invalid value'
-            error = True
+        built_in_unit = row[5]['val'] != ''
 
         try:
             unit = None
-            if row[12]['val'] != '':
-                unit = Unit.objects.get(name=row[12]['val'])
+            if row[4]['val'] != '':
+                unit = Unit.objects.get(name=row[4]['val'])
         except ObjectDoesNotExist:
-            row[12]['error'] = 'Invalid value'
+            row[4]['error'] = 'Invalid value'
             error = True
 
         if not error:
             # import item row
             item = Item(
-                name=row[0]['val'],
-                brand=row[1]['val'],
-                model=row[2]['val'],
-                serial_number=row[3]['val'],
-                item_type=item_type,
-                weight=weight,
-                width=width,
-                height=height,
-                depth=depth,
-                failure=failure,
-                length=length,
-                connector=row[11]['val'],
+                item_class=item_class,
+                name=row[1]['val'],
+                serial_number=row[2]['val'],
                 unit=unit,
+                built_in_unit=built_in_unit,
+                qrid=row[6]['val'],
             )
             item.save()
             imported.append(item)

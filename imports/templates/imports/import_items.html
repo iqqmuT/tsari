@@ -10,8 +10,8 @@
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">Example data</h5>
-      <pre><code>Item name;Brand;Model;Serial number;Type;Weight;Width;Height;Depth;Failure;Length;Connector;Unit
-Bolt;;;;Accessory;;;;;;;Bolt Box
+      <pre><code>Item class;Name;Serial number;Unit;Built in unit;Qrid
+1;Bolt;XYZ123;1;;ABC123
 </code></pre>
     </div>
   </div>
@@ -42,19 +42,12 @@ Bolt;;;;Accessory;;;;;;;Bolt Box
     <table class="table table-sm">
       <thead>
         <tr class="table-danger">
-          <th>Item name</th>
-          <th>Brand</th>
-          <th>Model</th>
+          <th>Item class</th>
+          <th>Name</th>
           <th>Serial number</th>
-          <th>Type</th>
-          <th>Weight</th>
-          <th>Width</th>
-          <th>Height</th>
-          <th>Depth</th>
-          <th>Failure</th>
-          <th>Length</th>
-          <th>Connector</th>
           <th>Unit</th>
+          <th>Built in unit</th>
+          <th>QRID</th>
         </tr>
       </thead>
     {% for row in failed %}
@@ -65,13 +58,6 @@ Bolt;;;;Accessory;;;;;;;Bolt Box
         <td class="{% if row.3.error %}text-danger{% endif %}">{{ row.3.val }}</td>
         <td class="{% if row.4.error %}text-danger{% endif %}">{{ row.4.val }}</td>
         <td class="{% if row.5.error %}text-danger{% endif %}">{{ row.5.val }}</td>
-        <td class="{% if row.6.error %}text-danger{% endif %}">{{ row.6.val }}</td>
-        <td class="{% if row.7.error %}text-danger{% endif %}">{{ row.7.val }}</td>
-        <td class="{% if row.8.error %}text-danger{% endif %}">{{ row.8.val }}</td>
-        <td class="{% if row.9.error %}text-danger{% endif %}">{{ row.9.val }}</td>
-        <td class="{% if row.10.error %}text-danger{% endif %}">{{ row.10.val }}</td>
-        <td class="{% if row.11.error %}text-danger{% endif %}">{{ row.11.val }}</td>
-        <td class="{% if row.12.error %}text-danger{% endif %}">{{ row.12.val }}</td>
       </tr>
     {% endfor %}
     </table>
@@ -85,36 +71,22 @@ Bolt;;;;Accessory;;;;;;;Bolt Box
     <table class="table table-sm">
       <thead>
         <tr>
-          <th>Item name</th>
-          <th>Brand</th>
-          <th>Model</th>
+          <th>Item class</th>
+          <th>Name</th>
           <th>Serial number</th>
-          <th>Type</th>
-          <th>Weight</th>
-          <th>Width</th>
-          <th>Height</th>
-          <th>Depth</th>
-          <th>Failure</th>
-          <th>Length</th>
-          <th>Connector</th>
           <th>Unit</th>
+          <th>Built in unit</th>
+          <th>QRID</th>
         </tr>
       </thead>
     {% for item in imported %}
       <tr>
+        <td>{{ item.item_class }}</td>
         <td>{{ item.name }}</td>
-        <td>{{ item.brand }}</td>
-        <td>{{ item.model }}</td>
         <td>{{ item.serial_number }}</td>
-        <td>{{ item.item_type }}</td>
-        <td>{{ item.weight }}</td>
-        <td>{{ item.width }}</td>
-        <td>{{ item.height }}</td>
-        <td>{{ item.depth }}</td>
-        <td>{{ item.failure }}</td>
-        <td>{{ item.length }}</td>
-        <td>{{ item.connector }}</td>
         <td>{{ item.unit }}</td>
+        <td>{{ item.built_in_unit }}</td>
+        <td>{{ item.qrid }}</td>
       </tr>
     {% endfor %}
     </table>
