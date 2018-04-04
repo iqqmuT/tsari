@@ -58,7 +58,7 @@ Then exit from psql shell and run:
     # If you need to make new migration files
     docker-compose run web python3 manage.py makemigrations
 
-    docker-compose run web pytho3n manage.py migrate
+    docker-compose run web python3 manage.py migrate
     docker-compose run web python3 manage.py createsuperuser
 
 ### Rebuild Web Docker Image

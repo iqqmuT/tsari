@@ -38,7 +38,7 @@ class Location(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return "%d - %s" % (self.id, self.name)
 
     class Meta:
         ordering = ['name']
@@ -51,7 +51,7 @@ class ContactPerson(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return "%d - %s" % (self.id, self.name)
 
     class Meta:
         ordering = ['name']
@@ -70,7 +70,7 @@ class Convention(models.Model):
 
     def __str__(self):
         if self.lang is not None:
-            return "%s (%s) %d" % (self.name, self.lang.code, self.id)
+            return "%d - %s (%s)" % (self.id, self.name, self.lang.code)
         return self.name
 
     class Meta:
@@ -106,6 +106,7 @@ class TransportOrder(models.Model):
     to_loc_load_in = models.DateTimeField(null=True, blank=True)
     notes = models.CharField(max_length=512, blank=True)
     unit_notes = models.CharField(max_length=512, blank=True)
+    disabled = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -145,11 +146,12 @@ class Equipment(models.Model):
     footprint = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2)
     pallet_space = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2)
     space_calculated = models.BooleanField(default=False)
+    disabled = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return "%d - %s" % (self.id, self.name)
 
     class Meta:
         ordering = ['name']
