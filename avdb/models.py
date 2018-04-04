@@ -333,6 +333,7 @@ class ItemClass(models.Model):
 
     class Meta:
         ordering = ['description']
+        verbose_name_plural = 'Item classes'
 
 class Item(models.Model):
     item_class = models.ForeignKey(ItemClass, on_delete=models.CASCADE)
