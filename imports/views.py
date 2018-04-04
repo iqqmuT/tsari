@@ -19,6 +19,7 @@ from .forms import ImportCSVFileForm
 
 import csv
 from decimal import Decimal, InvalidOperation
+
 import logging
 logger = logging.getLogger(__name__)
 

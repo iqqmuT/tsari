@@ -30,6 +30,12 @@ Press `Ctrl-C`.
 
     docker-compose run web python3 manage.py <command>
 
+### Getting Django shell (iPython)
+
+    docker-compose run web /bin/bash
+    pip3 install ipython
+    python3 manage.py shell
+
 ## Manual database handling
 
 ### Connect to database

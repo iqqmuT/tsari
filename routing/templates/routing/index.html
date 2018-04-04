@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+{% load i18n %}
+
+<h1>Equipment Routing {{ year }}</h1>
+
+<form class="form">
+<table class="table table-sm table-hover routing-table text-nowrap">
+  <thead>
+    <tr>
+      <th></th>
+      <th class="tcol-unit">{% trans "UNIT" %}</th>
+      <th class="tcol-units">{% trans "Items" %}</th>
+      <th class="tcol-pallet-space">Pallet<br>Space</th>
+      <th class="tcol-footprint text-center">m<sup>2</sup></th>
+      <th class="tcol-from">From</th>
+      {% for week in weeks %}
+        <th class="tcol-week" colspan="2">WEEK {{ week.number }}</th>
+      {% endfor %}
+      <th class="tcol-to" colspan="2">To</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for objs in equipment_groups %}
+      {% for obj in objs %}
+        <tr style="border: 1px solid #ccc;">
+          {% if forloop.first %}
+            <td class="tcol-equipment-group align-middle" rowspan="{{ objs|length }}">{{ obj.eq.equipment_type.name }}</td>
+          {% else %}
+          {% endif %}
+          <td class="tcol-unit">{{ obj.eq }}</td>
+          <td class="tcol-units">{{ obj.eq.get_parent_units_num }}</td>
+          <td class="tcol-pallet-space">{{ obj.eq.pallet_space }}</td>
+          <td class="tcol-footprint">{{ obj.eq.footprint }}</td>
+
+          <td class="tcol-from">
+            <div class="dropdown">
+              <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown">
+                Finland Branch Depot
+              </button>
+              <div class="dropdown-menu">
+                {% for location in all_locations %}
+                  <a class="dropdown-item" data-value="c-{{ location.id }}" href="#">
+                    {{ location }}</a>
+                {% endfor %}
+              </div>
+            </div>
+          </td>
+
+          {% for week in obj.weeks %}
+            <td>
+              <i class="far fa-arrow-alt-circle-right"></i>
+            </td>
+            <td class="tcol-week" style="white-space: nowrap;">
+
+              <div class="dropdown">
+                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown">
+                  Tampere 2 (FI) 2
+                </button>
+                <div class="dropdown-menu">
+                  {% for convention in week.conventions %}
+                    <a class="dropdown-item" data-value="c-{{ convention.id }}" href="#">
+                      {{ convention }}</a>
+                  {% endfor %}
+
+                  {% for location in week.other_locations %}
+                    <a class="dropdown-item" data-value="c-{{ location.id }}" href="#">
+                      {{ location }}</a>
+                  {% endfor %}
+                </div>
+              </div>
+            </td>
+          {% endfor %}
+
+          <td>
+             <i class="far fa-arrow-alt-circle-right"></i>
+          </td>
+
+          <td class="tcol-to">
+            <div class="dropdown">
+              <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown">
+                Finland Branch Depot
+              </button>
+              <div class="dropdown-menu">
+                {% for location in all_locations %}
+                  <a class="dropdown-item" data-value="c-{{ location.id }}" href="#">
+                    {{ location }}</a>
+                {% endfor %}
+              </div>
+            </div>
+          </td>
+
+
+        </tr>
+      {% endfor %}
+    {% endfor %}
+  </tbody>
+</table>
+</form>
+
+{% endblock %}
