@@ -1,3 +1,4 @@
+import json
 from datetime import timedelta
 
 from django.contrib.auth.decorators import user_passes_test
@@ -9,6 +10,7 @@ from avdb.models import \
     Convention, \
     Equipment, \
     Location, \
+    LocationType, \
     TransportOrder, \
     TransportOrderLine
 
@@ -33,7 +35,7 @@ def index(request, year):
     start_date = start_date - timedelta(days=start_date.weekday() + 7)
 
     # move end_date forwards by week
-    end_date = end_date + timedelta(weeks=1)
+    end_date = end_date + timedelta(weeks=2)
 
     weeks = []
     monday = start_date
@@ -53,6 +55,36 @@ def index(request, year):
         _handle_equipments(elec_eqs, weeks),
     ]
 
+    to_data = [
+        {
+            'to': None,
+            'disabled': False,
+            'equipment': 13,
+            'week': monday.isoformat(),
+            'from': {
+                'type': 'location',
+                'id': 45,
+            },
+            'to': {
+                'type': 'convention',
+                'id': 13,
+            },
+        },
+        {
+            'to': 33,
+            'disabled': False,
+            'equipment': 13,
+            'week': monday.isoformat(),
+            'from': {
+                'type': 'location',
+                'id': 45,
+            },
+            'to': {
+                'type': 'convention',
+                'id': 13,
+            },
+        },
+    ]
     return render(request, 'routing/index.html', {
         'year': year,
         'equipment_groups': equipment_groups,
@@ -60,6 +92,7 @@ def index(request, year):
         'start': start_date,
         'end': end_date,
         'all_locations': Location.objects.all(),
+        'json': json.dumps(to_data),
     })
 
 def _get_first_convention(year):
@@ -86,7 +119,6 @@ def _get_latest_to(year):
     except TransportOrder.DoesNotExist:
         return None
 
-
 def _handle_equipments(equipments, weeks):
     objs = []
     for equipment in equipments:
@@ -97,8 +129,8 @@ def _handle_equipments(equipments, weeks):
                 'transport_order': None,
                 'convention': None,
                 'conventions': _get_conventions(week['number']),
+                'other_locations': _get_other_locations(),
             }
-            w['other_locations'] = _get_other_locations(w['conventions'])
             eq_weeks.append(w)
 
         objs.append({
@@ -114,9 +146,9 @@ def _get_conventions(week):
     return convention_cache[week]
 
 location_cache = {}
-def _get_other_locations(conventions):
-    key = ','.join(str(x) for x in conventions)
-    if key not in location_cache.keys():
-        location_ids = conventions.values_list('location__id', flat=True)
-        location_cache[key] = Location.objects.all().exclude(id__in=location_ids)
-    return location_cache[key]
+def _get_other_locations():
+    """Returns all locations except convention venues."""
+    if 'all' not in location_cache.keys():
+        conv_venue = LocationType.objects.get(name='Convention venue')
+        location_cache['all'] = Location.objects.exclude(loc_type=conv_venue)
+    return location_cache['all']
