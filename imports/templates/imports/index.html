@@ -5,26 +5,19 @@
 <div class="container">
   <h1 style="margin-top: 25px; margin-bottom: 50px;">CSV Import</h1>
 
-  <div class="row text-center" style="margin-bottom: 50px;">
-    <div class="col-4">
+  <div class="row" style="margin-bottom: 50px;">
+    <div class="col">
       <a href="{% url 'import_locations' %}" class="btn btn-outline-dark">Locations</a>
-    </div>
-    <div class="col-4">
       <a href="{% url 'import_contact_persons' %}" class="btn btn-outline-dark">Contact Persons</a>
-    </div>
-    <div class="col-4">
       <a href="{% url 'import_conventions' %}" class="btn btn-outline-dark">Conventions</a>
     </div>
   </div>
 
-  <div class="row text-center">
-    <div class="col-4">
+  <div class="row">
+    <div class="col">
       <a href="{% url 'import_equipments' %}" class="btn btn-outline-danger">Equipments</a>
-    </div>
-    <div class="col-4">
       <a href="{% url 'import_units' %}" class="btn btn-outline-success">Units</a>
-    </div>
-    <div class="col-4">
+      <a href="{% url 'import_item_classes' %}" class="btn btn-outline-info">Item Classes</a>
       <a href="{% url 'import_items' %}" class="btn btn-outline-info">Items</a>
     </div>
   </div>
