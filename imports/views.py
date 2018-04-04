@@ -336,7 +336,7 @@ def handle_equipments_file(f):
         try:
             footprint = None
             if row[2]['val'] != '':
-                footprint = Decimal(row[2]['val'])
+                footprint = Decimal(row[2]['val'].replace(',', '.'))
         except InvalidOperation:
             row[2]['error'] = 'Invalid value'
             error = True
@@ -344,7 +344,7 @@ def handle_equipments_file(f):
         try:
             pallet_space = None
             if row[3]['val'] != '':
-                pallet_space = Decimal(row[3]['val'])
+                pallet_space = Decimal(row[3]['val'].replace('.', '.'))
         except InvalidOperation:
             row[3]['error'] = 'Invalid value'
             error = True
@@ -424,7 +424,7 @@ def handle_units_file(f):
         try:
             footprint = None
             if row[2]['val'] != '':
-                footprint = Decimal(row[2]['val'])
+                footprint = Decimal(row[2]['val'].replace(',', '.'))
         except InvalidOperation:
             row[2]['error'] = 'Invalid value'
             error = True
@@ -432,7 +432,7 @@ def handle_units_file(f):
         try:
             pallet_space = None
             if row[3]['val'] != '':
-                pallet_space = Decimal(row[3]['val'])
+                pallet_space = Decimal(row[3]['val'].replace(',', '.'))
         except InvalidOperation:
             row[3]['error'] = 'Invalid value'
             error = True

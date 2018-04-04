@@ -106,6 +106,7 @@ class TransportOrder(models.Model):
     to_loc_load_in = models.DateTimeField(null=True, blank=True)
     notes = models.CharField(max_length=512, blank=True)
     unit_notes = models.CharField(max_length=512, blank=True)
+    disabled = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -145,6 +146,7 @@ class Equipment(models.Model):
     footprint = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2)
     pallet_space = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2)
     space_calculated = models.BooleanField(default=False)
+    disabled = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
