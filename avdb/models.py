@@ -38,7 +38,7 @@ class Location(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return "%d - %s" % (self.id, self.name)
 
     class Meta:
         ordering = ['name']
@@ -51,7 +51,7 @@ class ContactPerson(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return "%d - %s" % (self.id, self.name)
 
     class Meta:
         ordering = ['name']
@@ -70,7 +70,7 @@ class Convention(models.Model):
 
     def __str__(self):
         if self.lang is not None:
-            return "%s (%s) %d" % (self.name, self.lang.code, self.id)
+            return "%d - %s (%s)" % (self.id, self.name, self.lang.code)
         return self.name
 
     class Meta:
@@ -151,7 +151,7 @@ class Equipment(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return "%d - %s" % (self.id, self.name)
 
     class Meta:
         ordering = ['name']
