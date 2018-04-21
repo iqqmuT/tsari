@@ -30,5 +30,6 @@ urlpatterns = [
     path('import/items/', imports_views.import_items, name='import_items'),
     path('import/', imports_views.index, name='import_index'),
     path('routing/<int:year>/', routing_views.index, name='routing_index'),
+    path('routing/<int:year>/save', routing_views.save, name='routing_save'),
     path('start/', avdb_views.start, name='start'),
 ]

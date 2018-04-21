@@ -7,6 +7,7 @@
 <h1>Equipment Routing {{ year }}</h1>
 
 <form class="form">
+{% csrf_token %}
 <table class="table table-sm table-hover routing-table text-nowrap">
   <thead>
     <tr>
@@ -40,15 +41,15 @@
           <td class="tcol-pallet-space">{{ obj.eq.pallet_space }}</td>
           <td class="tcol-footprint">{{ obj.eq.footprint }}</td>
 
-          <td class="tcol-from">
-            <div class="dropdown">
-              <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown">
+          <td class="tcol-from text-center">
+            <div class="dropdown select-loc">
+              <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
                 Finland Branch Depot
               </button>
               <div class="dropdown-menu">
                 {% for location in all_locations %}
-                  <a class="dropdown-item" data-value="c-{{ location.id }}" href="#">
-                    {{ location }}</a>
+                  <span class="dropdown-item" data-location="{{ location.id }}">
+                    {{ location.name }}</span>
                 {% endfor %}
               </div>
             </div>
@@ -56,20 +57,22 @@
 
           {% for week in obj.weeks %}
             <td>
-              <i class="far fa-arrow-alt-circle-right"></i>
+              <div data-to-idx="">
+                <i class="far fa-arrow-alt-circle-right to-button"></i>
+              </div>
             </td>
 
             {% if forloop.last %}
 
-              <td class="tcol-to">
-                <div class="dropdown">
-                  <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown">
+              <td class="tcol-to text-center">
+                <div class="dropdown select-loc">
+                  <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
                     Finland Branch Depot
                   </button>
                   <div class="dropdown-menu">
                     {% for location in all_locations %}
-                      <a class="dropdown-item" data-value="c-{{ location.id }}" href="#">
-                        {{ location }}</a>
+                      <span class="dropdown-item" data-location="{{ location.id }}">
+                        {{ location.name }}</span>
                     {% endfor %}
                   </div>
                 </div>
@@ -77,21 +80,21 @@
 
             {% else %}
 
-              <td class="tcol-week" style="white-space: nowrap;">
+              <td class="tcol-week text-center" style="white-space: nowrap;">
 
-                <div class="dropdown">
-                  <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown">
+                <div class="dropdown select-loc">
+                  <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
                     Tampere 2 (FI) 2
                   </button>
                   <div class="dropdown-menu">
                     {% for convention in week.conventions %}
-                      <a class="dropdown-item" data-value="c-{{ convention.id }}" href="#">
-                        {{ convention }}</a>
+                      <span class="dropdown-item" data-convention="{{ convention.id }}" data-location="{{ convention.location.id }}">
+                        {{ convention.name }} ({{ convention.lang.code }})</span>
                     {% endfor %}
 
                     {% for location in week.other_locations %}
-                      <a class="dropdown-item" data-value="c-{{ location.id }}" href="#">
-                        {{ location }}</a>
+                      <span class="dropdown-item" data-location="{{ location.id }}">
+                        {{ location.name }}</span>
                     {% endfor %}
                   </div>
                 </div>
@@ -108,16 +111,274 @@
 </table>
 </form>
 
+<div class="row d-print-none">
+  <div class="col">
+    <button class="btn btn-primary btn-lg" id="save-button" style="margin-left: 25px;">Save</button>
+  </div>
+</div>
+
+<!-- Transport Order modal -->
+<div id="to-modal" class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Transport Order</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div> <!-- modal-header -->
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="to-name">Name</label>
+            <input id="to-name" type="text" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="to-load-out">Load out from <span id="to-from"></span></label>
+            <input id="to-load-out" type="text" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="to-load-in">Load in to <span id="to-to"></span></label>
+            <input id="to-load-in" type="text" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="to-notes">Notes</label>
+            <input id="to-notes" type="text" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="to-unit-notes">Unit notes</label>
+            <input id="to-unit-notes" type="text" class="form-control">
+          </div>
+
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" id="to-save-button">OK</button>
+      </div>
+    </div> <!-- .modal-content -->
+  </div> <!-- .modal-dialog -->
+</div> <!-- .modal -->
+
 {% endblock %}
 
 {% block javascript %}
 
 <script>
+var cols = {{ weeks|length }} + 1;
 var toData = {{ json|safe }};
+var conventions = {{ conventions|safe }};
+var locations = {{ locations_json|safe }};
+var selectedTOIdx = null;
+
 $(document).ready(function() {
-  console.log('TransportOrder data');
-  console.log(toData);
+  //var i, j;
+  //i = j = 0;
+  var i = 0;
+  $('[data-to-idx=""]').each(function() {
+    $(this).attr('data-to-idx', i++);
+  });
+
+  $('[data-convention],[data-location]').on('click', function() {
+    var conventionId = $(this).data('convention');
+    var locationId = $(this).data('location');
+    locationPicked($(this), locationId, conventionId);
+  });
+
+  $('.to-button').on('click', function() {
+    openTOModal($(this));
+  });
+
+  $('#to-save-button').on('click', function() {
+    saveModalFields();
+  });
+
+  $('#save-button').on('click', function() {
+    save();
+  });
 });
+
+// Called when convention/location is picked from dropdown list
+function locationPicked($elem, locationId, conventionId) {
+  console.debug('location', locationId, 'convention', conventionId);
+  // change button html value
+  var html = $elem.html();
+  $elem.parent().parent().children('button').html(html);
+
+  // set data to toData
+  var toIdx = prevTOIndex($elem);
+  if (toIdx !== undefined) {
+    var obj = {
+      location: locationId,
+      convention: conventionId,
+    };
+    if (conventionId && conventions[conventionId]) {
+      obj.load_in = conventions[conventionId].load_in;
+    }
+    toData[toIdx].to = obj;
+  }
+
+  toIdx = nextTOIndex($elem);
+  if (toIdx !== undefined) {
+    var obj = {
+      location: locationId,
+      convention: conventionId
+    };
+    if (conventionId && conventions[conventionId]) {
+      obj.load_out = conventions[conventionId].load_out;
+    }
+    toData[toIdx].from = obj;
+  }
+}
+
+// Opens modal for Transport Order modifications
+function openTOModal($elem) {
+  var toIdx = $elem.parent().data('to-idx');
+  selectedTOIdx = toIdx;
+  console.debug(toData[toIdx]);
+  fillModalFields(toData[toIdx]);
+  $('#to-modal').modal('show');
+}
+
+function fillModalFields(to) {
+  $('#to-name').val(to.name);
+  $('#to-notes').val(to.notes);
+  $('#to-unit-notes').val(to.unitNotes);
+
+  if (to.from.convention && conventions[to.from.convention]) {
+    $('#to-from').html(conventions[to.from.convention].name);
+  }
+  else if (to.from.location && locations[to.from.location]) {
+    $('#to-from').html(locations[to.from.location].name);
+  }
+
+  $('#to-load-out').val(to.from.load_out);
+
+  if (to.to.convention && conventions[to.to.convention]) {
+    $('#to-to').html(conventions[to.to.convention].name);
+  }
+  else if (to.to.location && locations[to.to.location]) {
+    $('#to-to').html(locations[to.to.location].name);
+  }
+
+  $('#to-load-in').val(to.to.load_in);
+
+}
+
+function saveModalFields() {
+  var sameTOs = findSameTOs(selectedTOIdx);
+  saveTOData(toData[selectedTOIdx]);
+
+  // save same data to other TO objects which should be the same
+  for (var i = 0; i < sameTOs.length; i++) {
+    copyTOData(toData[selectedTOIdx], sameTOs[i]);
+    //saveTOData(sameTOs[i]);
+  }
+}
+
+function saveTOData(to) {
+  to.name = $('#to-name').val();
+  to.notes = $('#to-notes').val();
+  to.unitNotes = $('#to-unit-notes').val();
+  to.from.load_out = $('#to-load-out').val();
+  to.to.load_in = $('#to-load-in').val();
+}
+
+function copyTOData(src, dst) {
+  dst.name = src.name;
+  dst.notes = src.notes;
+  dst.unitNotes = src.unitNotes;
+  dst.from.load_out = src.from.load_out;
+  dst.to.load_in = src.to.load_in;
+}
+
+// finds other TO objects which should be the same
+function findSameTOs(idx) {
+  var tos = [];
+  var a = toData[idx];
+  for (var i = 0; i < toData.length; i++) {
+    if (i === idx) continue;
+    var b = toData[i];
+    if (equalTOs(a, b)) {
+      tos.push(b);
+    }
+  }
+  return tos;
+}
+
+function equalTOs(a, b) {
+  if (a.from.location !== b.from.location) return false;
+  if (a.from.load_out !== b.from.load_out) return false;
+  if (a.to.location !== b.to.location) return false;
+  if (a.to.load_in !== b.to.load_in) return false;
+  return true;
+}
+
+function getConvention(id) {
+  return conventions[id];
+}
+
+// Returns previous
+function prevTOIndex($elem) {
+  return $elem.parent().parent().parent().prev('td').children().data('to-idx');
+}
+
+// Returns next
+function nextTOIndex($elem) {
+  return $elem.parent().parent().parent().next('td').children().data('to-idx');
+}
+
+// Saves form
+function save() {
+  var url = 'save';
+  var data = {
+    tos: toData,
+  };
+
+  //setCSRFToken();
+  var csrfToken = $('[name=csrfmiddlewaretoken]').val();
+
+  var jqxhr = $.ajax({
+    type: 'POST',
+    url: url,
+    data: JSON.stringify(data),
+    contentType: 'application/json; charset=utf-8',
+    dataType: 'json',
+    beforeSend: function(xhr, settings) {
+      xhr.setRequestHeader('X-CSRFToken', csrfToken);
+    },
+    success: function(response) {
+      console.debug('Saved', response);
+    },
+  });
+  jqxhr.fail(function(response) {
+    console.error('Error when saving', response);
+    alert('Error in saving');
+  });
+}
+
+function setCSRFToken() {
+  function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+
+  $.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+      if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+        xhr.setRequestHeader('X-CSRFToken', csrfToken);
+      }
+    }
+  });
+}
+
 </script>
 
 {% endblock %}

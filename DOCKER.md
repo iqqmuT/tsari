@@ -63,7 +63,9 @@ Then exit from psql shell and run:
 
 ### Rebuild Web Docker Image
 
-    docker-compose build
+If you have changed `requirements.txt` or you just want to rebuild Web Docker image:
+
+    docker-compose build web
 
 ### Test data
 

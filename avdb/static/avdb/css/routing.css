@@ -2,3 +2,11 @@
   writing-mode: vertical-lr;
   width: 2rem;
 }
+
+.dropdown-item {
+  cursor: pointer;
+}
+
+.to-button {
+  cursor: pointer;
+}
