@@ -3,6 +3,20 @@
   width: 2rem;
 }
 
+/* Transport order edit icon */
+.to-button {
+  font-size: 1.4em;
+  color: #d56508;
+  margin-top: 5px;
+}
+
+.location-button {
+  /*background-color: #*/
+}
+
+.convention-button {
+}
+
 .dropdown-item {
   cursor: pointer;
 }

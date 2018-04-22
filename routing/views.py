@@ -63,8 +63,8 @@ def index(request, year):
     monday = start_date
     while monday < end_date:
         weeks.append({
-            'monday': monday,
-            'sunday': monday + timedelta(days=6),
+            'monday': _get_previous_monday(monday),
+            'sunday': _get_next_sunday(monday),
             'number': monday.isocalendar()[1],
         })
         monday = monday + timedelta(weeks=1)
@@ -84,7 +84,7 @@ def index(request, year):
         'conventions': json.dumps(_get_conventions_json()),
         'start': start_date,
         'end': end_date,
-        'all_locations': Location.objects.all(),
+        'other_locations': _get_other_locations(),
         'locations_json': json.dumps(_get_locations_json()),
         'json': json.dumps(to_data),
     })
@@ -231,7 +231,7 @@ def _get_conventions_json():
     data = {}
     for conv in Convention.objects.all():
         d = {
-            'name': "%s (%s)" % (conv.name, conv.lang.code),
+            'name': conv.routing_name()
         }
         if conv.load_in is not None:
             d['load_in'] = conv.load_in.isoformat()
@@ -267,8 +267,13 @@ def _get_latest_to(year):
 
 def _handle_equipments(equipments, weeks, to_data):
     objs = []
+    first = True
     for equipment in equipments:
         eq_weeks = []
+        selected = "Select"
+        start_location = selected
+        latest_location = None
+        latest_convention = None
         for week in weeks:
             # transport data
             tod = {
@@ -277,14 +282,64 @@ def _handle_equipments(equipments, weeks, to_data):
                 'equipment': equipment.pk,
                 'week': week['monday'].isoformat(),
                 'from': {
-                    #'location': 1,
-                    #'convention': 4,
+                    #'location': latest_location,
+                    #'convention': latest_convention,
                 },
                 'to': {
-                    #'location': 2,
-                    #'convention': 4,
+                    #'location': latest_location,
+                    #'convention': latest_convention,
                 }
             }
+            if latest_location is not None:
+                tod['from']['location'] = latest_location
+                tod['to']['location'] = latest_location
+            if latest_convention is not None:
+                tod['from']['convention'] = latest_convention
+                tod['to']['convention'] = latest_convention
+
+            # find matching TransportOrderLine and fill information from there to toData object
+            tols = _find_tols(equipment.pk, week['monday'], week['sunday'])
+            if len(tols):
+                to = tols.first().transport_order
+                tod['name'] = to.name
+                tod['notes'] = to.notes
+                tod['unitNotes'] = to.unit_notes
+                if to.from_loc is not None:
+                    tod['from']['location'] = to.from_loc.pk
+                    if first:
+                        selected = to.from_loc.name
+                        start_location = to.from_loc.name
+                    if len(eq_weeks) > 0:
+                        eq_weeks[len(eq_weeks)-1]['selected'] = to.from_loc.name
+
+                if to.from_convention is not None:
+                    tod['from']['convention'] = to.from_convention.pk
+                    tod['from']['location'] = to.from_convention.location.pk
+                    if to.from_convention.load_out is not None:
+                        tod['from']['load_out'] = to.from_convention.load_out.isoformat()
+                    if first:
+                        selected = to.from_convention.routing_name()
+                        start_location = to.from_convention.routing_name()
+                    if len(eq_weeks) > 0:
+                        eq_weeks[len(eq_weeks)-1]['selected'] = to.from_convention.routing_name()
+
+                if to.from_loc_load_out is not None:
+                    tod['from']['load_out'] = to.from_loc_load_out.isoformat()
+                
+                if to.to_loc is not None:
+                    tod['to']['location'] = to.to_loc.pk
+                    selected = to.to_loc.name
+                    latest_location = to.to_loc.pk
+                if to.to_convention is not None:
+                    tod['to']['convention'] = to.to_convention.pk
+                    tod['to']['location'] = to.to_convention.location.pk
+                    if to.to_convention.load_in is not None:
+                        tod['to']['load_in'] = to.to_convention.load_in.isoformat()
+                    selected = to.to_convention.routing_name()
+                    latest_convention = to.to_convention.pk
+                if to.to_loc_load_in is not None:
+                    tod['to']['load_in'] = to.to_loc_load_in.isoformat()
+ 
             to_data.append(tod)
 
             # week data
@@ -292,22 +347,29 @@ def _handle_equipments(equipments, weeks, to_data):
                 'week': week,
                 'to_idx': len(to_data) - 1, # index for to_data
                 'convention': None,
-                'conventions': _get_conventions(week['number']),
+                'conventions': _get_conventions(week['monday'], week['sunday']),
                 'other_locations': _get_other_locations(),
+                'selected': selected,
             }
             eq_weeks.append(w)
 
         objs.append({
             'eq': equipment,
             'weeks': eq_weeks,
+            'start_location': start_location,
         })
+        first = False
     return objs
 
 convention_cache = {}
-def _get_conventions(week):
-    if week not in convention_cache.keys():
-        convention_cache[week] = Convention.objects.all()
-    return convention_cache[week]
+def _get_conventions(start, end):
+    key = start.isoformat() + end.isoformat()
+    if key not in convention_cache.keys():
+        convention_cache[key] = Convention.objects.filter(
+            starts__gte=start,
+            ends__lte=end,
+        )
+    return convention_cache[key]
 
 location_cache = {}
 def _get_other_locations():
@@ -317,16 +379,15 @@ def _get_other_locations():
         location_cache['all'] = Location.objects.exclude(loc_type=conv_venue)
     return location_cache['all']
 
-def _deprecated_find_tols(equipment_id, start_time, end_time):
+def _find_tols(equipment_id, start, end):
     """Returns existing TransportOrderLines matching with given arguments."""
-    logger.error('Trying to find TOL')
-    logger.error(equipment_id)
-    logger.error(start_time)
-    logger.error(end_time)
+    #logger.error('Trying to find TOL')
+    #logger.error(equipment_id)
+    #logger.error(start_time)
+    #logger.error(end_time)
     tols = TransportOrderLine.objects.filter(
-        equipment__id=equipment_id,
-        transport_order__from_loc_load_out__gte=start_time,
-        transport_order__to_loc_load_in__lte=end_time,
+        equipment__id=equipment_id).filter(
+        Q(transport_order__from_loc_load_out__range=(start, end)) | Q(transport_order__to_loc_load_in__range=(start, end)) | Q(transport_order__from_convention__load_out__range=(start, end)) | Q(transport_order__to_convention__load_in__range=(start, end))
     )
     return tols
 

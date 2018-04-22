@@ -73,6 +73,10 @@ class Convention(models.Model):
             return "%d - %s (%s)" % (self.id, self.name, self.lang.code)
         return self.name
 
+    def routing_name(self):
+        """Returns name for routing usage."""
+        return "%s (%s)" % (self.name, self.lang.code)
+
     class Meta:
         ordering = ['starts', 'name']
 

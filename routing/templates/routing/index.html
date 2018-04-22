@@ -13,7 +13,7 @@
     <tr>
       <th></th>
       <th class="tcol-unit">{% trans "UNIT" %}</th>
-      <th class="tcol-units">{% trans "Items" %}</th>
+      <!-- <th class="tcol-units">{% trans "Items" %}</th> -->
       <th class="tcol-pallet-space">Pallet<br>Space</th>
       <th class="tcol-footprint text-center">m<sup>2</sup></th>
       <th class="tcol-from">From</th>
@@ -22,7 +22,8 @@
           {% if forloop.last %}
             To
           {% else %}
-            WEEK {{ week.number }}
+          WEEK {{ week.number }}<br>
+          {{ week.monday|date:"d.m." }} &ndash; {{ week.sunday|date:"d.m." }}
           {% endif %}
         </th>
       {% endfor %}
@@ -37,17 +38,17 @@
           {% else %}
           {% endif %}
           <td class="tcol-unit">{{ obj.eq.name }}</td>
-          <td class="tcol-units">{{ obj.eq.get_parent_units_num }}</td>
+          <!-- <td class="tcol-units">{{ obj.eq.get_parent_units_num }}</td> -->
           <td class="tcol-pallet-space">{{ obj.eq.pallet_space }}</td>
           <td class="tcol-footprint">{{ obj.eq.footprint }}</td>
 
           <td class="tcol-from text-center">
             <div class="dropdown select-loc">
               <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
-                Finland Branch Depot
+                {{ obj.start_location }}
               </button>
               <div class="dropdown-menu">
-                {% for location in all_locations %}
+                {% for location in other_locations %}
                   <span class="dropdown-item" data-location="{{ location.id }}">
                     {{ location.name }}</span>
                 {% endfor %}
@@ -57,7 +58,7 @@
 
           {% for week in obj.weeks %}
             <td>
-              <div data-to-idx="">
+              <div data-to-idx="" style="display: none; color: #ff0000;">
                 <i class="far fa-arrow-alt-circle-right to-button"></i>
               </div>
             </td>
@@ -67,10 +68,10 @@
               <td class="tcol-to text-center">
                 <div class="dropdown select-loc">
                   <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
-                    Finland Branch Depot
+                    {{ week.selected }}
                   </button>
                   <div class="dropdown-menu">
-                    {% for location in all_locations %}
+                    {% for location in other_locations %}
                       <span class="dropdown-item" data-location="{{ location.id }}">
                         {{ location.name }}</span>
                     {% endfor %}
@@ -84,7 +85,7 @@
 
                 <div class="dropdown select-loc">
                   <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
-                    Tampere 2 (FI) 2
+                    {{ week.selected }}
                   </button>
                   <div class="dropdown-menu">
                     {% for convention in week.conventions %}
@@ -96,6 +97,12 @@
                       <span class="dropdown-item" data-location="{{ location.id }}">
                         {{ location.name }}</span>
                     {% endfor %}
+
+                    {% if not forloop.last %}
+                      <span class="dropdown-item" data-in-transit="true">
+                        In transit
+                      </span>
+                    {% endif %}
                   </div>
                 </div>
               </td>
@@ -186,10 +193,11 @@ $(document).ready(function() {
     $(this).attr('data-to-idx', i++);
   });
 
-  $('[data-convention],[data-location]').on('click', function() {
+  $('[data-convention],[data-location],[data-in-transit]').on('click', function() {
     var conventionId = $(this).data('convention');
     var locationId = $(this).data('location');
-    locationPicked($(this), locationId, conventionId);
+    var inTransit = $(this).data('in-transit') !== undefined;
+    locationPicked($(this), locationId, conventionId, inTransit);
   });
 
   $('.to-button').on('click', function() {
@@ -203,14 +211,35 @@ $(document).ready(function() {
   $('#save-button').on('click', function() {
     save();
   });
+
+  for (var j = 0; j < toData.length; j++) {
+    checkTOVisibility(j);
+  }
 });
 
 // Called when convention/location is picked from dropdown list
-function locationPicked($elem, locationId, conventionId) {
+function locationPicked($elem, locationId, conventionId, inTransit) {
   console.debug('location', locationId, 'convention', conventionId);
-  // change button html value
+
+  // change text in button
   var html = $elem.html();
-  $elem.parent().parent().children('button').html(html);
+  var button = $elem.parent().parent().children('button');
+  button.html(html);
+
+  // change button style
+  button.removeClass('btn-secondary');
+  button.removeClass('btn-success');
+  button.removeClass('btn-info');
+  button.removeClass('btn-warning');
+  if (inTransit) {
+    button.addClass('btn-warning');
+  }
+  else if (conventionId === undefined) {
+    button.addClass('btn-info');
+  }
+  else {
+    button.addClass('btn-success');
+  }
 
   // set data to toData
   var toIdx = prevTOIndex($elem);
@@ -218,23 +247,69 @@ function locationPicked($elem, locationId, conventionId) {
     var obj = {
       location: locationId,
       convention: conventionId,
+      inTransit: inTransit,
     };
     if (conventionId && conventions[conventionId]) {
       obj.load_in = conventions[conventionId].load_in;
     }
     toData[toIdx].to = obj;
+    checkTOVisibility(toIdx);
   }
 
   toIdx = nextTOIndex($elem);
   if (toIdx !== undefined) {
     var obj = {
       location: locationId,
-      convention: conventionId
+      convention: conventionId,
+      inTransit: inTransit,
     };
     if (conventionId && conventions[conventionId]) {
       obj.load_out = conventions[conventionId].load_out;
     }
     toData[toIdx].from = obj;
+    checkTOVisibility(toIdx);
+  }
+}
+
+// Returns value from TO 'from' fields.
+// Follows inTransit chain automatically.
+function getTOFromField(toIdx, field) {
+  if (toIdx < 0) {
+    console.error('getTOFromField', toIdx, field, 'too low index');
+    return undefined;
+  }
+  if (toData[toIdx].from.inTransit) {
+    // get field from previous TO
+    return getTOFromField(toIdx - 1, field);
+  }
+  return toData[toIdx].from[field];
+}
+
+// Returns value from TO 'to' fields.
+// Follows inTransit chain automatically.
+function getTOToField(toIdx, field) {
+  if (toIdx >= toData.length) {
+    console.error('getTOToField', toIdx, field, 'too high index');
+    return undefined;
+  }
+  if (toData[toIdx].to.inTransit) {
+    // get field from next TO
+    return getTOToField(toIdx + 1, field);
+  }
+  return toData[toIdx].to[field];
+}
+
+// checks if from and to are same location, disable TO and hide the icon
+function checkTOVisibility(toIdx) {
+  var to = toData[toIdx];
+  if (getTOFromField(toIdx, 'location') === getTOToField(toIdx, 'location') || to.to.inTransit) {
+    // same location
+    to.disabled = true;
+    $('[data-to-idx=' + toIdx + ']').hide();
+  }
+  else {
+    to.disabled = false;
+    $('[data-to-idx=' + toIdx + ']').show();
   }
 }
 
@@ -242,33 +317,40 @@ function locationPicked($elem, locationId, conventionId) {
 function openTOModal($elem) {
   var toIdx = $elem.parent().data('to-idx');
   selectedTOIdx = toIdx;
-  console.debug(toData[toIdx]);
-  fillModalFields(toData[toIdx]);
+  //console.debug(toData[toIdx]);
+  fillModalFields(toIdx);
   $('#to-modal').modal('show');
 }
 
-function fillModalFields(to) {
+function fillModalFields(toIdx) {
+  var to = toData[toIdx];
   $('#to-name').val(to.name);
   $('#to-notes').val(to.notes);
   $('#to-unit-notes').val(to.unitNotes);
 
-  if (to.from.convention && conventions[to.from.convention]) {
-    $('#to-from').html(conventions[to.from.convention].name);
+  var fromConvention = getTOFromField(toIdx, 'convention');
+  var fromLocation = getTOFromField(toIdx, 'location');
+  if (fromConvention && conventions[fromConvention]) {
+    $('#to-from').html(conventions[fromConvention].name);
   }
-  else if (to.from.location && locations[to.from.location]) {
-    $('#to-from').html(locations[to.from.location].name);
-  }
-
-  $('#to-load-out').val(to.from.load_out);
-
-  if (to.to.convention && conventions[to.to.convention]) {
-    $('#to-to').html(conventions[to.to.convention].name);
-  }
-  else if (to.to.location && locations[to.to.location]) {
-    $('#to-to').html(locations[to.to.location].name);
+  else if (fromLocation && locations[fromLocation]) {
+    $('#to-from').html(locations[fromLocation].name);
   }
 
-  $('#to-load-in').val(to.to.load_in);
+  var fromLoadOut = getTOFromField(toIdx, 'load_out');
+  $('#to-load-out').val(fromLoadOut);
+
+  var toConvention = getTOToField(toIdx, 'convention');
+  var toLocation = getTOToField(toIdx, 'location');
+  if (toConvention && conventions[toConvention]) {
+    $('#to-to').html(conventions[toConvention].name);
+  }
+  else if (toLocation && locations[toLocation]) {
+    $('#to-to').html(locations[toLocation].name);
+  }
+
+  var toLoadIn = getTOToField(toIdx, 'load_in');
+  $('#to-load-in').val(toLoadIn);
 
 }
 
