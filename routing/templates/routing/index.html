@@ -3,6 +3,7 @@
 {% block main %}
 
 {% load i18n %}
+{% load routing_extras %}
 
 <h1>Equipment Routing {{ year }}</h1>
 
@@ -44,8 +45,8 @@
 
           <td class="tcol-from text-center">
             <div class="dropdown select-loc">
-              <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
-                {{ obj.start_location }}
+              <button class="btn btn-sm dropdown-toggle btn-{{ obj.start_location.type|route_class }}" type="button" data-toggle="dropdown">
+                {{ obj.start_location.name }}
               </button>
               <div class="dropdown-menu">
                 {% for location in other_locations %}
@@ -67,8 +68,8 @@
 
               <td class="tcol-to text-center">
                 <div class="dropdown select-loc">
-                  <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
-                    {{ week.selected }}
+                  <button class="btn btn-sm dropdown-toggle btn-{{ week.selected.type|route_class }}" type="button" data-toggle="dropdown">
+                    {{ week.selected.name }}
                   </button>
                   <div class="dropdown-menu">
                     {% for location in other_locations %}
@@ -84,8 +85,8 @@
               <td class="tcol-week text-center" style="white-space: nowrap;">
 
                 <div class="dropdown select-loc">
-                  <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
-                    {{ week.selected }}
+                  <button class="btn btn-sm dropdown-toggle btn-{{ week.selected.type|route_class }}" type="button" data-toggle="dropdown">
+                    {{ week.selected.name }} {{ week.selected.type }}
                   </button>
                   <div class="dropdown-menu">
                     {% for convention in week.conventions %}

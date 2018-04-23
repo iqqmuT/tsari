@@ -289,7 +289,10 @@ def _handle_equipments(equipments, weeks, to_data):
     first = True
     for equipment in equipments:
         eq_weeks = []
-        selected = "Select"
+        selected = {
+            'name': 'Select',
+            'type': None
+        }
         start_location = selected
         latest_location = None
         latest_convention = None
@@ -326,10 +329,16 @@ def _handle_equipments(equipments, weeks, to_data):
                 if to.from_loc is not None:
                     tod['from']['location'] = to.from_loc.pk
                     if first:
-                        selected = to.from_loc.name
-                        start_location = to.from_loc.name
+                        selected = {
+                            'name': to.from_loc.name,
+                            'type': 'location'
+                        }
+                        start_location = selected
                     if len(eq_weeks) > 0:
-                        eq_weeks[len(eq_weeks)-1]['selected'] = to.from_loc.name
+                        eq_weeks[len(eq_weeks)-1]['selected'] = {
+                            'name': to.from_loc.name,
+                            'type': 'location'
+                        }
 
                 if to.from_convention is not None:
                     tod['from']['convention'] = to.from_convention.pk
@@ -337,24 +346,36 @@ def _handle_equipments(equipments, weeks, to_data):
                     if to.from_convention.load_out is not None:
                         tod['from']['load_out'] = to.from_convention.load_out.isoformat()
                     if first:
-                        selected = to.from_convention.routing_name()
-                        start_location = to.from_convention.routing_name()
+                        selected = {
+                            'name': to.from_convention.routing_name(),
+                            'type': 'convention',
+                        }
+                        start_location = selected
                     if len(eq_weeks) > 0:
-                        eq_weeks[len(eq_weeks)-1]['selected'] = to.from_convention.routing_name()
+                        eq_weeks[len(eq_weeks)-1]['selected'] = {
+                            'name': to.from_convention.routing_name(),
+                            'type': 'convention',
+                        }
 
                 if to.from_loc_load_out is not None:
                     tod['from']['load_out'] = to.from_loc_load_out.isoformat()
                 
                 if to.to_loc is not None:
                     tod['to']['location'] = to.to_loc.pk
-                    selected = to.to_loc.name
+                    selected = {
+                        'name': to.to_loc.name,
+                        'type': 'location'
+                    }
                     latest_location = to.to_loc.pk
                 if to.to_convention is not None:
                     tod['to']['convention'] = to.to_convention.pk
                     tod['to']['location'] = to.to_convention.location.pk
                     if to.to_convention.load_in is not None:
                         tod['to']['load_in'] = to.to_convention.load_in.isoformat()
-                    selected = to.to_convention.routing_name()
+                    selected = {
+                        'name': to.to_convention.routing_name(),
+                        'type': 'convention',
+                    }
                     latest_convention = to.to_convention.pk
                 if to.to_loc_load_in is not None:
                     tod['to']['load_in'] = to.to_loc_load_in.isoformat()
