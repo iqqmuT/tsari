@@ -105,9 +105,28 @@ def save(request, year):
     for id in eq_ids:
         _remove_tols(id, year)
 
+    # transit_from is storage for transit information
+    transit_from = None
     for to_data in data['tos']:
         if to_data['disabled'] == False:
+            if 'inTransit' in to_data['from'].keys() and to_data['from']['inTransit'] == True and to_data['to']['inTransit'] == False:
+                # end of transit
+
+                # from.load_out is saved to last TO in transit in UI
+                if 'load_out' in to_data['from'].keys():
+                    transit_from['load_out'] = to_data['from']['load_out']
+
+                # copy 'from' data from beginning of transit
+                to_data['from'] = transit_from
+                transit_from = None
+
+            # save TO data
             tol = _save_to_data(to_data)
+
+        else:
+            if 'inTransit' in to_data['to'].keys() and to_data['to']['inTransit'] == True and to_data['from']['inTransit'] == False:
+                # save 'from' data from beginning of transit
+                transit_from = to_data['from']
 
     return JsonResponse({ 'ok': True })
 
@@ -117,9 +136,9 @@ def _save_to_data(to_data):
     if to is None:
         # could not create TO
         return None
-    week = dateparser.parse(to_data['week'])
-    monday = _get_previous_monday(week)
-    sunday = _get_next_sunday(week)
+    #week = dateparser.parse(to_data['week'])
+    #monday = _get_previous_monday(week)
+    #sunday = _get_next_sunday(week)
 
     # create new TransportOrderLine
     tol = TransportOrderLine(
