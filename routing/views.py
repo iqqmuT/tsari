@@ -286,7 +286,6 @@ def _get_latest_to(year):
 
 def _handle_equipments(equipments, weeks, to_data):
     objs = []
-    first = True
     for equipment in equipments:
         eq_weeks = []
         selected = {
@@ -328,7 +327,7 @@ def _handle_equipments(equipments, weeks, to_data):
                 tod['unitNotes'] = to.unit_notes
                 if to.from_loc is not None:
                     tod['from']['location'] = to.from_loc.pk
-                    if first:
+                    if start_location['type'] is None:
                         selected = {
                             'name': to.from_loc.name,
                             'type': 'location'
@@ -345,7 +344,7 @@ def _handle_equipments(equipments, weeks, to_data):
                     tod['from']['location'] = to.from_convention.location.pk
                     if to.from_convention.load_out is not None:
                         tod['from']['load_out'] = to.from_convention.load_out.isoformat()
-                    if first:
+                    if start_location['type'] is None:
                         selected = {
                             'name': to.from_convention.routing_name(),
                             'type': 'convention',
@@ -398,7 +397,6 @@ def _handle_equipments(equipments, weeks, to_data):
             'weeks': eq_weeks,
             'start_location': start_location,
         })
-        first = False
     return objs
 
 convention_cache = {}
