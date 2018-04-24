@@ -8,4 +8,6 @@ def route_class(value):
         return 'success'
     elif value == 'location':
         return 'info'
+    elif value == 'inTransit':
+        return 'warning'
     return 'secondary'

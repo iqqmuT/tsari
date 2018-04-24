@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -133,6 +135,23 @@ class TransportOrder(models.Model):
 
     class Meta:
         ordering = ['name']
+
+    def get_from_load_out(self):
+        if self.from_convention is not None:
+            return self.from_convention.load_out
+        return self.from_loc_load_out
+
+    def get_to_load_in(self):
+        if self.to_convention is not None:
+            return self.to_convention.load_in
+        return self.to_loc_load_in
+
+    def transit_length(self):
+        start = self.get_from_load_out()
+        end = self.get_to_load_in()
+        if start is not None and end is not None:
+            return end - start
+        return None
 
 class EquipmentType(models.Model):
     name = models.CharField(max_length=64)

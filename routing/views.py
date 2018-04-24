@@ -322,9 +322,12 @@ def _handle_equipments(equipments, weeks, to_data):
             tols = _find_tols(equipment.pk, week['monday'], week['sunday'])
             if len(tols):
                 to = tols.first().transport_order
+                logger.error('HAJSDHKJHDKJSAH')
+                logger.error('TRANSIT LENGTH %s' % (to.transit_length()))
                 tod['name'] = to.name
                 tod['notes'] = to.notes
                 tod['unitNotes'] = to.unit_notes
+
                 if to.from_loc is not None:
                     tod['from']['location'] = to.from_loc.pk
                     if start_location['type'] is None:
@@ -358,7 +361,12 @@ def _handle_equipments(equipments, weeks, to_data):
 
                 if to.from_loc_load_out is not None:
                     tod['from']['load_out'] = to.from_loc_load_out.isoformat()
-                
+
+                # special case: in transit
+                transit_length = to.transit_length()
+                if transit_length is not None and transit_length.days > 7:
+                    _handle_in_transit(to, tod, to_data, eq_weeks)
+
                 if to.to_loc is not None:
                     tod['to']['location'] = to.to_loc.pk
                     selected = {
@@ -376,6 +384,13 @@ def _handle_equipments(equipments, weeks, to_data):
                         'type': 'convention',
                     }
                     latest_convention = to.to_convention.pk
+
+                if 'inTransit' in tod['to'].keys() and tod['to']['inTransit'] == True:
+                    selected = {
+                        'name': 'In transit',
+                        'type': 'inTransit',
+                    }
+
                 if to.to_loc_load_in is not None:
                     tod['to']['load_in'] = to.to_loc_load_in.isoformat()
  
@@ -399,6 +414,36 @@ def _handle_equipments(equipments, weeks, to_data):
         })
     return objs
 
+def _handle_in_transit(to, tod, to_data, eq_weeks):
+    transit_weeks = to.transit_length().days / 7
+    convention = None
+    location = None
+    if 'convention' in tod['from'].keys():
+        convention = tod['from']['convention']
+    if 'location' in tod['from'].keys():
+        location = tod['from']['location']
+    tod['from']['inTransit'] = True
+    tod['from']['convention'] = None
+    tod['from']['location'] = None
+    i = 0
+    l = len(to_data)
+    l2 = len(eq_weeks)
+    while i < transit_weeks - 2:
+        to_data[l-i-1]['to']['inTransit'] = True
+        to_data[l-i-1]['from']['inTransit'] = True
+        eq_weeks[l2-i-1]['selected'] = {
+            'name': 'In transit',
+            'type': 'inTransit',
+        }
+        i = i + 1
+    to_data[l-i-1]['to']['inTransit'] = True
+    to_data[l-i-1]['from']['convention'] = convention
+    to_data[l-i-1]['from']['location'] = location
+    eq_weeks[l2-i-1]['selected'] = {
+        'name': 'In transit',
+        'type': 'inTransit',
+    }
+
 convention_cache = {}
 def _get_conventions(start, end):
     key = start.isoformat() + end.isoformat()
@@ -418,14 +463,17 @@ def _get_other_locations():
     return location_cache['all']
 
 def _find_tols(equipment_id, start, end):
-    """Returns existing TransportOrderLines matching with given arguments."""
+    """Returns existing TransportOrderLines matching with given arguments.
+       Matches only if load_in is matching between start and end."""
     #logger.error('Trying to find TOL')
     #logger.error(equipment_id)
     #logger.error(start_time)
     #logger.error(end_time)
     tols = TransportOrderLine.objects.filter(
         equipment__id=equipment_id).filter(
-        Q(transport_order__from_loc_load_out__range=(start, end)) | Q(transport_order__to_loc_load_in__range=(start, end)) | Q(transport_order__from_convention__load_out__range=(start, end)) | Q(transport_order__to_convention__load_in__range=(start, end))
+        Q(transport_order__to_loc_load_in__range=(start, end)) | Q(transport_order__to_convention__load_in__range=(start, end))
+        #Q(transport_order__from_loc_load_out__range=(start, end)) | Q(transport_order__to_loc_load_in__range=(start, end)) | Q(transport_order__from_convention__load_out__range=(start, end)) | Q(transport_order__to_convention__load_in__range=(start, end))
+
     )
     return tols
 
