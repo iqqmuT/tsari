@@ -322,8 +322,6 @@ def _handle_equipments(equipments, weeks, to_data):
             tols = _find_tols(equipment.pk, week['monday'], week['sunday'])
             if len(tols):
                 to = tols.first().transport_order
-                logger.error('HAJSDHKJHDKJSAH')
-                logger.error('TRANSIT LENGTH %s' % (to.transit_length()))
                 tod['name'] = to.name
                 tod['notes'] = to.notes
                 tod['unitNotes'] = to.unit_notes
