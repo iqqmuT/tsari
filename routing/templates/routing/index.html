@@ -144,12 +144,12 @@
 
           <div class="form-group">
             <label for="to-load-out">Load out from <span id="to-from"></span></label>
-            <input id="to-load-out" type="text" class="form-control">
+            <input id="to-load-out" type="text" class="form-control" required>
           </div>
 
           <div class="form-group">
             <label for="to-load-in">Load in to <span id="to-to"></span></label>
-            <input id="to-load-in" type="text" class="form-control">
+            <input id="to-load-in" type="text" class="form-control" required>
           </div>
 
           <div class="form-group">
@@ -202,7 +202,8 @@ $(document).ready(function() {
   });
 
   $('.to-button').on('click', function() {
-    openTOModal($(this));
+    var toIdx = $(this).parent().data('to-idx');
+    openTOModal(toIdx);
   });
 
   $('#to-save-button').on('click', function() {
@@ -242,6 +243,8 @@ function locationPicked($elem, locationId, conventionId, inTransit) {
     button.addClass('btn-success');
   }
 
+  var modalOpened = false;
+
   // set data to toData
   var toIdx = prevTOIndex($elem);
   if (toIdx !== undefined) {
@@ -254,7 +257,13 @@ function locationPicked($elem, locationId, conventionId, inTransit) {
       obj.load_in = conventions[conventionId].load_in;
     }
     toData[toIdx].to = obj;
-    checkTOVisibility(toIdx);
+    var visible = checkTOVisibility(toIdx);
+
+    if (visible && toIsIncomplete(toIdx)) {
+      openTOModal(toIdx);
+      modalOpened = true;
+    }
+    console.debug(getTOFromField(toIdx, 'location'), getTOToField(toIdx, 'location'), getTOToField(toIdx, 'load_in'));
   }
 
   toIdx = nextTOIndex($elem);
@@ -268,8 +277,22 @@ function locationPicked($elem, locationId, conventionId, inTransit) {
       obj.load_out = conventions[conventionId].load_out;
     }
     toData[toIdx].from = obj;
-    checkTOVisibility(toIdx);
+    var visible = checkTOVisibility(toIdx);
+    if (!modalOpened && visible && toIsIncomplete(toIdx)) {
+      // from.load_out is empty, we need a value for it
+      openTOModal(toIdx);
+      modalOpened = true;
+    }
   }
+}
+
+// Returns true if given TO is incomplete.
+// There are locations defined but load_out or load_in is undefined.
+function toIsIncomplete(toIdx) {
+  return ((getTOFromField(toIdx, 'load_out') === undefined ||
+           getTOToField(toIdx, 'load_in') === undefined) &&
+           getTOFromField(toIdx, 'location') !== undefined &&
+           getTOToField(toIdx, 'location') !== undefined);
 }
 
 // Returns value from TO 'from' fields.
@@ -312,11 +335,11 @@ function checkTOVisibility(toIdx) {
     to.disabled = false;
     $('[data-to-idx=' + toIdx + ']').show();
   }
+  return !to.disabled;
 }
 
 // Opens modal for Transport Order modifications
-function openTOModal($elem) {
-  var toIdx = $elem.parent().data('to-idx');
+function openTOModal(toIdx) {
   selectedTOIdx = toIdx;
   //console.debug(toData[toIdx]);
   fillModalFields(toIdx);
