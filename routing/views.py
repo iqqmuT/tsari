@@ -107,9 +107,10 @@ def save(request, year):
 
     # transit_from is storage for transit information
     transit_from = None
+
     for to_data in data['tos']:
         if to_data['disabled'] == False:
-            if 'inTransit' in to_data['from'].keys() and to_data['from']['inTransit'] == True and to_data['to']['inTransit'] == False:
+            if 'inTransit' in to_data['from'].keys() and to_data['from']['inTransit'] == True and ('inTransit' not in to_data['to'].keys() or to_data['to']['inTransit'] == False):
                 # end of transit
 
                 # from.load_out is saved to last TO in transit in UI
@@ -124,7 +125,7 @@ def save(request, year):
             tol = _save_to_data(to_data)
 
         else:
-            if 'inTransit' in to_data['to'].keys() and to_data['to']['inTransit'] == True and to_data['from']['inTransit'] == False:
+            if 'inTransit' in to_data['to'].keys() and to_data['to']['inTransit'] == True and ('inTransit' not in to_data['from'].keys() or to_data['from']['inTransit'] == False):
                 # save 'from' data from beginning of transit
                 transit_from = to_data['from']
 
@@ -167,10 +168,10 @@ def _get_or_create_to(to_data):
     from_convention = None
     from_load_out = None
     if 'from' in to_data.keys():
-        if 'convention' in to_data['from'].keys():
+        if 'convention' in to_data['from'].keys() and to_data['from']['convention'] is not None:
             id = to_data['from']['convention']
             from_convention = Convention.objects.get(pk=id)
-        if 'location' in to_data['from'].keys():
+        if 'location' in to_data['from'].keys() and to_data['from']['location'] is not None:
             id = to_data['from']['location']
             from_location = Location.objects.get(pk=id)
         if from_convention is None and 'load_out' in to_data['from'].keys() and _is_valid_datetime(to_data['from']['load_out']):
@@ -180,14 +181,14 @@ def _get_or_create_to(to_data):
     to_convention = None
     to_load_in = None
     if 'from' in to_data.keys():
-        if 'convention' in to_data['to'].keys():
+        if 'convention' in to_data['to'].keys() and to_data['to']['convention'] is not None:
             id = to_data['to']['convention']
             to_convention = Convention.objects.get(pk=id)
-        if 'location' in to_data['to'].keys():
+        if 'location' in to_data['to'].keys() and to_data['to']['location'] is not None:
             id = to_data['to']['location']
             to_location = Location.objects.get(pk=id)
-        if to_convention is None and 'load_out' in to_data['to'].keys() and _is_valid_datetime(to_data['to']['load_in']):
-            to_load_out = to_data['to']['load_in']
+        if to_convention is None and 'load_in' in to_data['to'].keys() and _is_valid_datetime(to_data['to']['load_in']):
+            to_load_in = dateparser.parse(to_data['to']['load_in'])
 
     if from_location is None or to_location is None:
         # can't create TransportOrder with empty Locations
@@ -303,20 +304,20 @@ def _handle_equipments(equipments, weeks, to_data):
                 'equipment': equipment.pk,
                 'week': week['monday'].isoformat(),
                 'from': {
-                    #'location': latest_location,
-                    #'convention': latest_convention,
+                    #'location': None,
+                    #'convention': None,
                 },
                 'to': {
-                    #'location': latest_location,
-                    #'convention': latest_convention,
+                    #'location': None,
+                    #'convention': None,
                 }
             }
-            if latest_location is not None:
-                tod['from']['location'] = latest_location
-                tod['to']['location'] = latest_location
-            if latest_convention is not None:
-                tod['from']['convention'] = latest_convention
-                tod['to']['convention'] = latest_convention
+            #if latest_location is not None:
+            #    tod['from']['location'] = latest_location
+            #    tod['to']['location'] = latest_location
+            #if latest_convention is not None:
+            #    tod['from']['convention'] = latest_convention
+            #    tod['to']['convention'] = latest_convention
 
             # find matching TransportOrderLine and fill information from there to toData object
             tols = _find_tols(equipment.pk, week['monday'], week['sunday'])
