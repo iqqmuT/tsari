@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 #   'unitNotes': 'Uniittinotes'
 # }
 
-#@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(lambda u: u.is_superuser)
 def index(request, year):
     video_eqs = Equipment.objects.filter(equipment_type__name='Video')
     audio_eqs = Equipment.objects.filter(equipment_type__name='Audio')

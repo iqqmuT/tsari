@@ -38,12 +38,19 @@
             <td class="tcol-equipment-group align-middle" rowspan="{{ objs|length }}">{{ obj.eq.equipment_type.name }}</td>
           {% else %}
           {% endif %}
-          <td class="tcol-unit">{{ obj.eq.name }}</td>
+
+          <td class="tcol-unit" style="white-space: nowrap;">
+            <button class="btn btn-sm btn-clone-route d-print-none" title="Clone previous equipment route" {% if forloop.first %}disabled{% endif %}>
+              <i class="far fa-clone"></i>
+            </button>
+            {{ obj.eq.name }}
+          </td>
+
           <!-- <td class="tcol-units">{{ obj.eq.get_parent_units_num }}</td> -->
           <td class="tcol-pallet-space">{{ obj.eq.pallet_space }}</td>
           <td class="tcol-footprint">{{ obj.eq.footprint }}</td>
 
-          <td class="tcol-from text-center">
+          <td class="tcol-from text-center" style="white-space: nowrap;">
             <div class="dropdown select-loc">
               <button class="btn btn-sm dropdown-toggle btn-{{ obj.start_location.type|route_class }}" type="button" data-toggle="dropdown">
                 {{ obj.start_location.name }}
@@ -194,6 +201,13 @@ $(document).ready(function() {
     $(this).attr('data-to-idx', i++);
   });
 
+  // assign data-clone-idx attributes for clone buttons
+  i = 0;
+  $('.btn-clone-route').each(function() {
+    $(this).attr('data-clone-idx', i);
+    i += cols - 1;
+  });
+
   $('[data-convention],[data-location],[data-in-transit]').on('click', function() {
     var conventionId = $(this).data('convention');
     var locationId = $(this).data('location');
@@ -214,10 +228,40 @@ $(document).ready(function() {
     save();
   });
 
+  $('.btn-clone-route').on('click', function() {
+    var row = $(this).parent().parent();
+    var srcButtons = row.prev().find('.dropdown-toggle');
+    var dstButtons = row.find('.dropdown-toggle');
+    cloneEquipmentButtons(srcButtons, dstButtons);
+
+    var toIdx = $(this).data('clone-idx');
+    cloneEquipmentRoute(toIdx, cols - 1);
+    return false;
+  });
+
   for (var j = 0; j < toData.length; j++) {
     checkTOVisibility(j);
   }
 });
+
+function cloneEquipmentButtons(srcButtons, dstButtons) {
+  // clone buttons html and classes
+  for (var i = 0; i < srcButtons.length; i++) {
+    $(dstButtons[i]).html($(srcButtons[i]).html());
+    $(dstButtons[i]).attr('class', $(srcButtons[i]).attr('class'));
+  }
+}
+
+function cloneEquipmentRoute(toIdx, len) {
+  // clone toDatas
+  for (var i = toIdx; i < toIdx + len; i++) {
+    srcTo = toData[i-len];
+    var eq = toData[i].equipment;
+    toData[i] = $.extend({}, srcTo);
+    toData[i].equipment = eq;
+    checkTOVisibility(i);
+  }
+}
 
 // Called when convention/location is picked from dropdown list
 function locationPicked($elem, locationId, conventionId, inTransit) {
