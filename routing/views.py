@@ -40,9 +40,9 @@ logger = logging.getLogger(__name__)
 
 @user_passes_test(lambda u: u.is_superuser)
 def index(request, year):
-    video_eqs = Equipment.objects.filter(equipment_type__name='Video')
-    audio_eqs = Equipment.objects.filter(equipment_type__name='Audio')
-    elec_eqs = Equipment.objects.filter(equipment_type__name='Electricity')
+    video_eqs = Equipment.objects.filter(equipment_type__name__istartswith='Video')
+    audio_eqs = Equipment.objects.filter(equipment_type__name__istartswith='Audio')
+    elec_eqs = Equipment.objects.filter(equipment_type__name__istartswith='Electricity')
 
     # get time period
     first = _get_first_convention(year)
