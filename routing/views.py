@@ -11,6 +11,7 @@ from django.utils import timezone
 from avdb.models import \
     Convention, \
     Equipment, \
+    EquipmentType, \
     Location, \
     LocationType, \
     TransportOrder, \
@@ -40,9 +41,13 @@ logger = logging.getLogger(__name__)
 
 @user_passes_test(lambda u: u.is_superuser)
 def index(request, year):
-    video_eqs = Equipment.objects.filter(equipment_type__name__istartswith='Video')
-    audio_eqs = Equipment.objects.filter(equipment_type__name__istartswith='Audio')
-    elec_eqs = Equipment.objects.filter(equipment_type__name__istartswith='Electricity')
+    video_types = EquipmentType.objects.filter(name__istartswith='Video').order_by('name')
+    audio_types = EquipmentType.objects.filter(name__istartswith='Audio').order_by('name')
+    elec_types = EquipmentType.objects.filter(name__istartswith='Electricity').order_by('name')
+
+    #video_eqs = Equipment.objects.filter(equipment_type__name__istartswith='Video')
+    #audio_eqs = Equipment.objects.filter(equipment_type__name__istartswith='Audio')
+    #elec_eqs = Equipment.objects.filter(equipment_type__name__istartswith='Electricity')
 
     # get time period
     first = _get_first_convention(year)
@@ -71,11 +76,16 @@ def index(request, year):
 
     to_data = []
 
-    equipment_groups = [
-        _handle_equipments(video_eqs, weeks, to_data),
-        _handle_equipments(audio_eqs, weeks, to_data),
-        _handle_equipments(elec_eqs, weeks, to_data),
-    ]
+    equipment_groups = []
+    equipment_groups.extend(_add_eq_group(video_types, weeks, to_data))
+    equipment_groups.extend(_add_eq_group(audio_types, weeks, to_data))
+    equipment_groups.extend(_add_eq_group(elec_types, weeks, to_data))
+
+    #equipment_groups = [
+    #    _handle_equipments(video_eqs, weeks, to_data),
+    #    _handle_equipments(audio_eqs, weeks, to_data),
+    #    _handle_equipments(elec_eqs, weeks, to_data),
+    #]
 
     return render(request, 'routing/index.html', {
         'year': year,
@@ -88,6 +98,13 @@ def index(request, year):
         'locations_json': json.dumps(_get_locations_json()),
         'json': json.dumps(to_data),
     })
+
+def _add_eq_group(equipment_types, weeks, to_data):
+    groups = []
+    for eq_type in equipment_types:
+        eqs = Equipment.objects.filter(equipment_type=eq_type)
+        groups.append(_handle_equipments(eqs, weeks, to_data))
+    return groups
 
 # Save JSON request
 def save(request, year):
