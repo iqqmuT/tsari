@@ -335,6 +335,10 @@ def _handle_equipments(equipments, weeks, to_data):
                             'type': 'location'
                         }
                         start_location = selected
+                        # set selected for previous empty weeks
+                        for old_eq_week in eq_weeks:
+                            if old_eq_week['selected']['type'] is None:
+                                old_eq_week['selected'] = selected
                     if len(eq_weeks) > 0:
                         eq_weeks[len(eq_weeks)-1]['selected'] = {
                             'name': to.from_loc.name,
@@ -352,6 +356,11 @@ def _handle_equipments(equipments, weeks, to_data):
                             'type': 'convention',
                         }
                         start_location = selected
+                        # set selected for previous empty weeks
+                        for old_eq_week in eq_weeks:
+                            if old_eq_week['selected']['type'] is None:
+                                old_eq_week['selected'] = selected
+
                     if len(eq_weeks) > 0:
                         eq_weeks[len(eq_weeks)-1]['selected'] = {
                             'name': to.from_convention.routing_name(),
@@ -395,10 +404,11 @@ def _handle_equipments(equipments, weeks, to_data):
  
             to_data.append(tod)
 
+            logger.error('SELECTEEED %s' % (selected))
             # week data
             w = {
                 'week': week,
-                'to_idx': len(to_data) - 1, # index for to_data
+                #'to_idx': len(to_data) - 1, # index for to_data
                 'convention': None,
                 'conventions': _get_conventions(week['monday'], week['sunday']),
                 'other_locations': _get_other_locations(),
