@@ -320,7 +320,11 @@ def _handle_equipments(equipments, weeks, to_data):
             #    tod['to']['convention'] = latest_convention
 
             # find matching TransportOrderLine and fill information from there to toData object
-            tols = _find_tols(equipment.pk, week['monday'], week['sunday'])
+            filter_start = week['monday'] - timedelta(days=3)
+            tols = _find_tols(equipment.pk,
+                filter_start,
+                week['sunday'])
+
             if len(tols):
                 to = tols.first().transport_order
                 tod['name'] = to.name
