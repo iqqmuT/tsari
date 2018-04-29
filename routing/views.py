@@ -321,9 +321,10 @@ def _handle_equipments(equipments, weeks, to_data):
 
             # find matching TransportOrderLine and fill information from there to toData object
             filter_start = week['monday'] - timedelta(days=3)
+            filter_end = week['sunday'] - timedelta(days=3)
             tols = _find_tols(equipment.pk,
                 filter_start,
-                week['sunday'])
+                filter_end)
 
             if len(tols):
                 to = tols.first().transport_order
@@ -408,7 +409,6 @@ def _handle_equipments(equipments, weeks, to_data):
  
             to_data.append(tod)
 
-            logger.error('SELECTEEED %s' % (selected))
             # week data
             w = {
                 'week': week,
