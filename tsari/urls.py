@@ -18,6 +18,7 @@ from django.urls import path
 from avdb import views as avdb_views
 from imports import views as imports_views
 from routing import views as routing_views
+from docs import views as docs_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,5 +32,6 @@ urlpatterns = [
     path('import/', imports_views.index, name='import_index'),
     path('routing/<int:year>/', routing_views.index, name='routing_index'),
     path('routing/<int:year>/save', routing_views.save, name='routing_save'),
+    path('docs/transport_order/<int:to_id>/', docs_views.transport_order, name='docs_transport_order'),
     path('start/', avdb_views.start, name='start'),
 ]

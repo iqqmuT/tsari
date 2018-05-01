@@ -164,13 +164,24 @@
             <input id="to-notes" type="text" class="form-control">
           </div>
 
+          <!--
           <div class="form-group">
             <label for="to-unit-notes">Unit notes</label>
             <input id="to-unit-notes" type="text" class="form-control">
           </div>
+          -->
 
 
         </form>
+
+        <h5>Print</h5>
+        <p>Print only after you have saved changes and refreshed the page.</p>
+        <div class="">
+          <a href="" type="button" class="btn btn-secondary" id="to-link" target="_blank">
+            <i class="fas fa-print"></i>
+            Print</a>
+        </div>
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -419,6 +430,8 @@ function fillModalFields(toIdx) {
   var toLoadIn = getTOToField(toIdx, 'load_in');
   $('#to-load-in').val(toLoadIn);
 
+  var url = '/docs/transport_order/' + to.id;
+  $('#to-link').attr('href', url);
 }
 
 function saveModalFields() {

@@ -153,6 +153,18 @@ class TransportOrder(models.Model):
             return end - start
         return None
 
+    def get_from_loc(self):
+        """Helper method to get 'from' location."""
+        if self.from_convention is not None:
+            return self.from_convention.location
+        return self.from_loc
+
+    def get_to_loc(self):
+        """Helper method to get 'to' location."""
+        if self.to_convention is not None:
+            return self.to_convention.location
+        return self.to_loc
+
 class EquipmentType(models.Model):
     name = models.CharField(max_length=64)
 
@@ -182,12 +194,10 @@ class Equipment(models.Model):
     def unit_field_sum(self, field):
         """Returns sum of given item field."""
         total = 0
-        for unit in self.unit_set.all():
-            # sum only parent units
-            if unit.included_in is None:
-                value = getattr(unit, field)
-                if value is not None:
-                    total += value
+        for unit in self.get_parent_units():
+            value = getattr(unit, field)
+            if value is not None:
+                total += value
         return total
 
     def calculate_footprint(self):
@@ -206,6 +216,10 @@ class Equipment(models.Model):
     def weight(self):
         """Returns gross weight of equipment."""
         return self.unit_field_sum('gross_weight')
+
+    def get_parent_units(self):
+        """Helper method for getting only parent units."""
+        return self.unit_set.filter(included_in=None)
 
 class TransportOrderLine(models.Model):
     transport_order = models.ForeignKey(TransportOrder, on_delete=models.CASCADE)

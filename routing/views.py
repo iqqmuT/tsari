@@ -345,6 +345,7 @@ def _handle_equipments(equipments, weeks, to_data):
 
             if len(tols):
                 to = tols.first().transport_order
+                tod['id'] = to.pk
                 tod['name'] = to.name
                 tod['notes'] = to.notes
                 tod['unitNotes'] = to.unit_notes

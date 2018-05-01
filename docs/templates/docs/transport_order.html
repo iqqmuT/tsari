@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+{% load i18n %}
+{% load routing_extras %}
+
+<div class="container">
+  <div class="text-center">
+    <h1>TRANSPORT ORDER</h1>
+    <h4>{{ to.name }}
+      ({{ to.get_from_loc.abbreviation }} &mdash; {{ to.get_to_loc.abbreviation }})
+    </h4>
+  </div> <!-- .row -->
+
+  <div class="row">
+    <div class="col-1">From:</div>
+    <div class="col-11">
+      {% if to.from_convention %}{{ to.from_convention.routing_name }}{% elif to.from_loc %}{{ to.from_loc }}{% endif %}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-1">To:</div>
+    <div class="col-11">
+      {% if to.to_convention %}{{ to.to_convention.routing_name }}{% elif to.to_loc %}{{ to.to_loc.name }}{% endif %}
+    </div>
+  </div>
+
+  <h4 class="to-header">SHIPPING</h4>
+
+  <div class="row">
+    <div class="col-6">
+      <strong>LOADING</strong><br>
+
+      {% if to.from_convention.load_out %}
+        {{ to.from_convention.load_out|date:"d.m.Y H:i" }}
+      {% else %}
+        {{ to.from_loc_load_out|date:"d.m.Y H:i" }}
+      {% endif %}
+      <br>
+
+      {{ to.get_from_loc.address }}
+
+      {% if to.get_from_loc.entrance %}
+        <br>
+        {{ to.get_from_loc.entrance }}
+      {% endif %}
+    </div>
+
+    <div class="col-6">
+      <strong>UNLOADING</strong><br>
+      {% if to.to_convention.load_in %}
+        {{ to.to_convention.load_in|date:"d.m.Y H:i" }}
+      {% else %}
+        {{ to.to_loc_load_in|date:"d.m.Y H:i" }}
+      {% endif %}
+      <br>
+
+      {{ to.get_to_loc.address }}
+
+      {% if to.get_to_loc.entrance %}
+        <br>
+        {{ to.get_to_loc.entrance }}
+      {% endif %}
+
+    </div>
+  </div>
+
+  <h4 class="to-header">CONTACT</h4>
+
+  <div class="row">
+    <div class="col-6">
+      {% if to.from_convention.contact_person %}
+        {{ to.from_convention.contact_person.name }}<br>
+        {{ to.from_convention.contact_person.phone }}<br>
+        {{ to.from_convention.contact_person.email }}
+      {% endif %}
+    </div>
+
+    <div class="col-6">
+      {% if to.to_convention.contact_person %}
+        {{ to.to_convention.contact_person.name }}<br>
+        {{ to.to_convention.contact_person.phone }}<br>
+        {{ to.to_convention.contact_person.email }}
+      {% endif %}
+    </div>
+  </div>
+
+  <h4 class="to-header">NOTES</h4>
+  <p>{{ to.notes }}</p>
+
+  <h4 class="to-header">TRANSPORT DETAILS</h4>
+  Total: Units: {{ totals.units }}
+  Pallet space: {{ totals.pallet_space }}
+  m2: {{ totals.footprint }}
+
+</div> <!-- .container -->
+
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+$(document).ready(function() {
+});
+</script>
+
+{% endblock %}
