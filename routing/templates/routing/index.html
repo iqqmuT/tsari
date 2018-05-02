@@ -24,7 +24,7 @@
             To
           {% else %}
           WEEK {{ week.number }}<br>
-          {{ week.monday|date:"d.m." }} &ndash; {{ week.sunday|date:"d.m." }}
+          {{ week.monday|date:"j.n." }} &ndash; {{ week.sunday|date:"j.n." }}
           {% endif %}
         </th>
       {% endfor %}

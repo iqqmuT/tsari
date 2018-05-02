@@ -34,9 +34,9 @@
       <strong>LOADING</strong><br>
 
       {% if to.from_convention.load_out %}
-        {{ to.from_convention.load_out|date:"d.m.Y H:i" }}
+        {{ to.from_convention.load_out|date:"j.n.Y H:i" }}
       {% else %}
-        {{ to.from_loc_load_out|date:"d.m.Y H:i" }}
+        {{ to.from_loc_load_out|date:"j.n.Y H:i" }}
       {% endif %}
       <br>
 
@@ -51,9 +51,9 @@
     <div class="col-6">
       <strong>UNLOADING</strong><br>
       {% if to.to_convention.load_in %}
-        {{ to.to_convention.load_in|date:"d.m.Y H:i" }}
+        {{ to.to_convention.load_in|date:"j.n.Y H:i" }}
       {% else %}
-        {{ to.to_loc_load_in|date:"d.m.Y H:i" }}
+        {{ to.to_loc_load_in|date:"j.n.Y H:i" }}
       {% endif %}
       <br>
 
