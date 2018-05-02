@@ -3,7 +3,7 @@
 {% block main %}
 
 {% load i18n %}
-{% load routing_extras %}
+{% load docs_extras %}
 
 <div class="container">
   <div class="text-center">
@@ -16,14 +16,14 @@
   <div class="row">
     <div class="col-1">From:</div>
     <div class="col-11">
-      {% if to.from_convention %}{{ to.from_convention.routing_name }}{% elif to.from_loc %}{{ to.from_loc }}{% endif %}
+      {% if to.from_convention %}{{ to.from_convention.name }}{% elif to.from_loc %}{{ to.from_loc.name }}{% endif %}
     </div>
   </div>
 
   <div class="row">
     <div class="col-1">To:</div>
     <div class="col-11">
-      {% if to.to_convention %}{{ to.to_convention.routing_name }}{% elif to.to_loc %}{{ to.to_loc.name }}{% endif %}
+      {% if to.to_convention %}{{ to.to_convention.name }}{% elif to.to_loc %}{{ to.to_loc.name }}{% endif %}
     </div>
   </div>
 
@@ -100,28 +100,38 @@
     <thead class="">
       <tr>
         <th></th>
-        <th>Units</th>
-        <th>Pallet Space</th>
-        <th>m<sup>2</sup></th>
+        <th class="text-center">Units</th>
+        <th class="text-right">Pallet Space</th>
+        <th class="text-right">Footprint (m<sup>2</sup>)</th>
+        <th>To</th>
       </tr>
       <tr>
         <th>Total</th>
-        <th>{{ totals.units }}</th>
-        <th>{{ totals.pallet_space }}</th>
-        <th>{{ totals.footprint }}</th>
+        <th class="text-center">{{ totals.units|fi_nbr }}</th>
+        <th class="text-right">{{ totals.pallet_space|fi_nbr }}</th>
+        <th class="text-right">{{ totals.footprint|fi_nbr }}</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
-      {% for eq in equipments %}
-        <tr class="equipment">
-          <td>{{ eq.name }}</td>
-          <td>{{ eq.unit_set.count }}</td>
-          <td>{{ eq.pallet_space }}</td>
-          <td>{{ eq.footprint }}</td>
+      {% for tol in to_lines %}
+        <tr class="table-active">
+          <td>{{ tol.equipment.name }}</td>
+          <td class="text-center">{{ tol.equipment.unit_set.count }}</td>
+          <td class="text-right">{{ tol.equipment.pallet_space|fi_nbr }}</td>
+          <td class="text-right">{{ tol.equipment.footprint|fi_nbr }}</td>
+          <td>
+            {% if tol.transport_order.to_convention %}
+              {{ tol.transport_order.to_convention.routing_name }}
+            {% elif tol.transport_order.to_loc %}
+              {{ tol.transport_order.to_loc.name }}
+            {% endif %}
+          </td>
         </tr>
-        {% for unit in eq.get_parent_units %}
+        {% for unit in tol.equipment.get_parent_units %}
           <tr class="unit">
             <td>&#11036; {{ unit.name }}</td>
+            <td></td>
             <td></td>
             <td></td>
             <td></td>
