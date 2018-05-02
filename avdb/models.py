@@ -30,12 +30,10 @@ class LocationType(models.Model):
     class Meta:
         ordering = ['name']
 
-class Location(models.Model):
-    name = models.CharField(max_length=128)
-    address = models.CharField(max_length=256)
-    entrance = models.CharField(max_length=128, blank=True)
-    loc_type = models.ForeignKey(LocationType, null=True, on_delete=models.SET_NULL)
-    abbreviation = models.CharField(max_length=16)
+class ContactPerson(models.Model):
+    name = models.CharField(max_length=64)
+    phone = models.CharField(max_length=128, blank=True)
+    email = models.CharField(max_length=128, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -45,10 +43,24 @@ class Location(models.Model):
     class Meta:
         ordering = ['name']
 
-class ContactPerson(models.Model):
-    name = models.CharField(max_length=64)
-    phone = models.CharField(max_length=128, blank=True)
-    email = models.CharField(max_length=128, blank=True)
+class Location(models.Model):
+    name = models.CharField(max_length=128)
+    address = models.CharField(max_length=256)
+    entrance = models.CharField(max_length=128, blank=True)
+    loc_type = models.ForeignKey(LocationType, null=True, on_delete=models.SET_NULL)
+    abbreviation = models.CharField(max_length=16)
+    contact_person = models.ForeignKey(
+        ContactPerson,
+        null=True,
+        related_name='location_contact_person',
+        on_delete=models.SET_NULL
+    )
+    technical_contact = models.ForeignKey(
+        ContactPerson,
+        null=True,
+        related_name='location_technical_contact',
+        on_delete=models.SET_NULL
+    )
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -66,7 +78,18 @@ class Convention(models.Model):
     load_in = models.DateTimeField(blank=True, null=True)
     load_out = models.DateTimeField(blank=True, null=True)
     location = models.ForeignKey(Location, null=True, on_delete=models.SET_NULL)
-    contact_person = models.ForeignKey(ContactPerson, null=True, on_delete=models.SET_NULL)
+    contact_person = models.ForeignKey(
+        ContactPerson,
+        null=True,
+        related_name='convention_contact_person',
+        on_delete=models.SET_NULL
+    )
+    technical_contact = models.ForeignKey(
+        ContactPerson,
+        null=True,
+        related_name='convention_technical_contact',
+        on_delete=models.SET_NULL
+    )
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 

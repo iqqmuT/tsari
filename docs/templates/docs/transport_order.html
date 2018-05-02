@@ -76,19 +76,60 @@
 
   <div class="row">
     <div class="col-6">
+      <div class="p-1 mb-2 bg-secondary text-white">
+        <strong>CONTACT PERSON</strong>
+      </div>
+
       {% if to.from_convention.contact_person %}
-        {{ to.from_convention.contact_person.name }}<br>
-        {{ to.from_convention.contact_person.phone }}<br>
-        {{ to.from_convention.contact_person.email }}
+      {{ to.from_convention.contact_person|person }}<br>
+      {% elif to.from_location.contact_person %}
+      {{ to.from_location.contact_person|person }}<br>
       {% endif %}
     </div>
 
     <div class="col-6">
+      <div class="p-1 mb-2 bg-secondary text-white">
+        <strong>CONTACT PERSON</strong>
+      </div>
+      {% if to.to_convention.contact_person %}
+      {{ to.to_convention.contact_person|person }}<br>
+      {% elif to.to_location.contact_person %}
+        {{ to.to_location.contact_person|person }}<br>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <div class="row" style="margin-top: 1rem;">
+    <div class="col-6">
+
+      <div class="p-1 mb-2 bg-secondary text-white">
+        <strong>TECHNICAL CONTACT</strong>
+      </div>
+      {% if to.from_convention.technical_contact %}
+      {{ to.from_convention.technical_contact|person }}<br>
+      {% elif to.from_location.technical_contact %}
+      {{ to.from_location.technical_contact|person }}<br>
+      {% endif %}
+    </div>
+    <div class="col-6">
+
+      <div class="p-1 mb-2 bg-secondary text-white">
+        <strong>TECHNICAL CONTACT</strong>
+      </div>
+      {% if to.to_convention.technical_contact %}
+        {{ to.to_convention.technical_contact|person }}
+      {% elif to.to_location.technical_contact %}
+        {{ to.to_location.technical_contact|person }}
+      {% endif %}
+
+      <!--
       {% if to.to_convention.contact_person %}
         {{ to.to_convention.contact_person.name }}<br>
         {{ to.to_convention.contact_person.phone }}<br>
         {{ to.to_convention.contact_person.email }}
       {% endif %}
+      -->
     </div>
   </div>
 
@@ -98,11 +139,11 @@
   <h4 class="to-header">TRANSPORT DETAILS</h4>
   <table class="table table-sm table-to-details">
     <thead class="">
-      <tr>
+      <tr style="color: #fff !important; background-color: #95a5a6">
         <th></th>
-        <th class="text-center">Units</th>
-        <th class="text-right">Pallet Space</th>
-        <th class="text-right">Footprint (m<sup>2</sup>)</th>
+        <th class="text-center">UNITS</th>
+        <th class="text-right">PALLET SPACE</th>
+        <th class="text-right">FOOTPRINT (m<sup>2</sup>)</th>
         <th>To</th>
       </tr>
       <tr>
