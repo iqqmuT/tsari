@@ -13,6 +13,7 @@ from avdb.models import Equipment, \
 def transport_order(request, to_id):
     to = get_object_or_404(TransportOrder, pk=to_id)
 
+    equipments = []
     # calculate totals
     totals = {
         'units': 0,
@@ -20,6 +21,7 @@ def transport_order(request, to_id):
         'footprint': 0,
     }
     for to_line in to.transportorderline_set.all():
+        equipments.append(to_line.equipment)
         totals['units'] += to_line.equipment.get_parent_units().count()
         totals['pallet_space'] += to_line.equipment.pallet_space
         totals['footprint'] += to_line.equipment.footprint
@@ -27,4 +29,5 @@ def transport_order(request, to_id):
     return render(request, 'docs/transport_order.html', {
         'to': to,
         'totals': totals,
+        'equipments': equipments,
     })

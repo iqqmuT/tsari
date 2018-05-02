@@ -324,9 +324,9 @@ class Unit(models.Model):
         if self.included_in is not None:
             # update parent unit weight
             self.included_in.update_weight()
-        elif self.equipment is not None:
-            # no parent unit, update equipment gross weight
-            self.equipment.update_gross_weight()
+        #elif self.equipment is not None:
+        # no parent unit, update equipment gross weight
+        #    self.equipment.update_gross_weight()
 
 class TransportOrderUnit(models.Model):
     transport_order = models.ForeignKey(TransportOrder, on_delete=models.CASCADE)
