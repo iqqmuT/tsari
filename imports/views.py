@@ -36,7 +36,7 @@ def index(request):
 # LOCATIONS
 # ---------
 
-location_columns = ['Name', 'Address', 'Entrance', 'Loc type', 'Abbreviation']
+location_columns = ['Name', 'Address', 'Entrance', 'Loc type', 'Abbreviation', 'Contact person', 'Technical contact']
 
 @user_passes_test(lambda u: u.is_superuser)
 def import_locations(request):
@@ -80,6 +80,22 @@ def handle_locations_file(f):
             continue
 
         try:
+            contact_person = None
+            if row[5]['val'] != '':
+                contact_person = ContactPerson.objects.get(pk=row[5]['val'])
+        except ObjectDoesNotExist:
+            row[5]['error'] = 'Invalid value'
+            error = True
+
+        try:
+            technical_contact = None
+            if row[6]['val'] != '':
+                contact_person = ContactPerson.objects.get(pk=row[6]['val'])
+        except ObjectDoesNotExist:
+            row[6]['error'] = 'Invalid value'
+            error = True
+
+        try:
             loc_type = LocationType.objects.get(pk=row[3]['val'])
             if loc_type is not None:
                 # import location row
@@ -89,6 +105,8 @@ def handle_locations_file(f):
                     entrance=row[2]['val'],
                     loc_type=loc_type,
                     abbreviation=row[4]['val'],
+                    contact_person=contact_person,
+                    technical_contact=technical_contact,
                 )
                 location.save()
                 imported.append(location)
@@ -103,7 +121,7 @@ def handle_locations_file(f):
 # CONVENTIONS
 # -----------
 
-convention_columns = ['Name', 'Lang', 'Starts', 'Ends', 'Load in', 'Load out', 'Location', 'Contact person']
+convention_columns = ['Name', 'Lang', 'Starts', 'Ends', 'Load in', 'Load out', 'Location', 'Contact person', 'Technical Contact']
 
 @user_passes_test(lambda u: u.is_superuser)
 def import_conventions(request):
@@ -200,6 +218,14 @@ def handle_conventions_file(f):
             row[7]['error'] = 'Invalid value'
             error = True
 
+        try:
+            technical_contact = None
+            if row[8]['val'] != '':
+                technical_contact = ContactPerson.objects.get(pk=row[8]['val'])
+        except ObjectDoesNotExist:
+            row[8]['error'] = 'Invalid value'
+            error = True
+
         if not error:
             # import convention row
             convention = Convention(
@@ -211,6 +237,7 @@ def handle_conventions_file(f):
                 load_out=load_out,
                 location=location,
                 contact_person=contact_person,
+                technical_contact=technical_contact,
             )
             convention.save()
             imported.append(convention)

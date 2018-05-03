@@ -10,8 +10,8 @@
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">Example data</h5>
-      <pre><code>Name;Lang;Starts;Ends;Load in;Load out;Location;Contact person
-Helsinki;1;2018-06-15;2018-06-17;2018-06-15 09:00;2018-06-17 09:10;2;1</code></pre>
+      <pre><code>Name;Lang;Starts;Ends;Load in;Load out;Location;Contact person;Technical contact
+Helsinki;1;2018-06-15;2018-06-17;2018-06-15 09:00;2018-06-17 09:10;2;1;1</code></pre>
     </div>
   </div>
 
@@ -49,6 +49,7 @@ Helsinki;1;2018-06-15;2018-06-17;2018-06-15 09:00;2018-06-17 09:10;2;1</code></p
           <th>Load out</th>
           <th>Location</th>
           <th>Contact person</th>
+          <th>Technical contact</th>
         </tr>
       </thead>
     {% for row in failed %}
@@ -61,6 +62,7 @@ Helsinki;1;2018-06-15;2018-06-17;2018-06-15 09:00;2018-06-17 09:10;2;1</code></p
         <td class="{% if row.5.error %}text-danger{% endif %}">{{ row.5.val }}</td>
         <td class="{% if row.6.error %}text-danger{% endif %}">{{ row.6.val }}</td>
         <td class="{% if row.7.error %}text-danger{% endif %}">{{ row.7.val }}</td>
+        <td class="{% if row.8.error %}text-danger{% endif %}">{{ row.8.val }}</td>
       </tr>
     {% endfor %}
     </table>
@@ -82,6 +84,7 @@ Helsinki;1;2018-06-15;2018-06-17;2018-06-15 09:00;2018-06-17 09:10;2;1</code></p
           <th>Load out</th>
           <th>Location</th>
           <th>Contact person</th>
+          <th>Technical Contact</th>
         </tr>
       </thead>
     {% for convention in imported %}
@@ -94,6 +97,7 @@ Helsinki;1;2018-06-15;2018-06-17;2018-06-15 09:00;2018-06-17 09:10;2;1</code></p
         <td>{{ convention.load_out }}</td>
         <td>{{ convention.location }}</td>
         <td>{{ convention.contact_person }}</td>
+        <td>{{ convention.technical_contact }}</td>
       </tr>
     {% endfor %}
     </table>

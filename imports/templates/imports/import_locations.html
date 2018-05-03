@@ -10,8 +10,8 @@
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">Example data</h5>
-      <pre><code>Name;Address;Entrance;Loc type;Abbreviation
-Tampere Exhibition and Sports Centre;Ilmailunkatu 20, 33900 Tampere, Finland;Service Entrance A8;1;TRE</code></pre>
+      <pre><code>Name;Address;Entrance;Loc type;Abbreviation;Contact person;Technical contact
+Tampere Exhibition and Sports Centre;Ilmailunkatu 20, 33900 Tampere, Finland;Service Entrance A8;1;TRE;1;1</code></pre>
     </div>
   </div>
 
@@ -46,6 +46,8 @@ Tampere Exhibition and Sports Centre;Ilmailunkatu 20, 33900 Tampere, Finland;Ser
           <th>Entrance</th>
           <th>Loc type</th>
           <th>Abbreviation</th>
+          <th>Contact person</th>
+          <th>Technical contact</th>
         </tr>
       </thead>
     {% for row in failed %}
@@ -55,6 +57,8 @@ Tampere Exhibition and Sports Centre;Ilmailunkatu 20, 33900 Tampere, Finland;Ser
         <td class="{% if row.2.error %}text-danger{% endif %}">{{ row.2.val }}</td>
         <td class="{% if row.3.error %}text-danger{% endif %}">{{ row.3.val }}</td>
         <td class="{% if row.4.error %}text-danger{% endif %}">{{ row.4.val }}</td>
+        <td class="{% if row.5.error %}text-danger{% endif %}">{{ row.5.val }}</td>
+        <td class="{% if row.6.error %}text-danger{% endif %}">{{ row.6.val }}</td>
       </tr>
     {% endfor %}
     </table>
@@ -73,6 +77,8 @@ Tampere Exhibition and Sports Centre;Ilmailunkatu 20, 33900 Tampere, Finland;Ser
           <th>Entrance</th>
           <th>Loc type</th>
           <th>Abbreviation</th>
+          <th>Contact person</th>
+          <th>Technical contact</th>
         </tr>
       </thead>
     {% for location in imported %}
@@ -82,6 +88,8 @@ Tampere Exhibition and Sports Centre;Ilmailunkatu 20, 33900 Tampere, Finland;Ser
         <td>{{ location.entrance }}</td>
         <td>{{ location.loc_type }}</td>
         <td>{{ location.abbreviation }}</td>
+        <td>{{ location.contact_person }}</td>
+        <td>{{ location.technical_contact }}</td>
       </tr>
     {% endfor %}
     </table>
