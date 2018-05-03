@@ -7,6 +7,10 @@
 {% load qr_code %}
 
 <div class="container to-container">
+  <div class="position-absolute" style="right: 10px; top: 0">
+    {% qr_from_text dir_qr size="t" %}
+  </div>
+
   <div class="text-center">
     <h1>TRANSPORT ORDER</h1>
     <h4>{{ to.name }}
@@ -14,8 +18,6 @@
     </h4>
   </div> <!-- .row -->
 
-  <div class="row">
-    <div class="col-6 align-middle">
       <div class="row">
         <div class="col-1">From:</div>
         <div class="col-11">
@@ -29,12 +31,7 @@
           {% if to.to_convention %}{{ to.to_convention.name }}{% elif to.to_loc %}{{ to.to_loc.name }}{% endif %}
         </div>
       </div>
-    </div> <!-- .col -->
 
-    <div class="col-6 text-right">
-      {% qr_from_text dir_qr size="t" %}
-    </div>
-  </div> <!-- .row -->
 
   <h4 class="to-header">SHIPPING</h4>
 
