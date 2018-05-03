@@ -4,6 +4,7 @@
 
 {% load i18n %}
 {% load docs_extras %}
+{% load qr_code %}
 
 <div class="container to-container">
   <div class="text-center">
@@ -14,18 +15,26 @@
   </div> <!-- .row -->
 
   <div class="row">
-    <div class="col-1">From:</div>
-    <div class="col-11">
-      {% if to.from_convention %}{{ to.from_convention.name }}{% elif to.from_loc %}{{ to.from_loc.name }}{% endif %}
-    </div>
-  </div>
+    <div class="col-6 align-middle">
+      <div class="row">
+        <div class="col-1">From:</div>
+        <div class="col-11">
+          {% if to.from_convention %}{{ to.from_convention.name }}{% elif to.from_loc %}{{ to.from_loc.name }}{% endif %}
+        </div>
+      </div>
 
-  <div class="row">
-    <div class="col-1">To:</div>
-    <div class="col-11">
-      {% if to.to_convention %}{{ to.to_convention.name }}{% elif to.to_loc %}{{ to.to_loc.name }}{% endif %}
+      <div class="row">
+        <div class="col-1">To:</div>
+        <div class="col-11">
+          {% if to.to_convention %}{{ to.to_convention.name }}{% elif to.to_loc %}{{ to.to_loc.name }}{% endif %}
+        </div>
+      </div>
+    </div> <!-- .col -->
+
+    <div class="col-6 text-right">
+      {% qr_from_text dir_qr size="s" %}
     </div>
-  </div>
+  </div> <!-- .row -->
 
   <h4 class="to-header">SHIPPING</h4>
 
@@ -72,9 +81,18 @@
         <br>
         {{ to.get_to_loc.entrance }}
       {% endif %}
-
     </div>
   </div>
+  <!-- 
+  <div class="row">
+    <div class="col-6">
+      {% qr_from_text from_qr size="s" %}
+    </div>
+    <div class="col-6">
+      {% qr_from_text to_qr size="s" %}
+    </div>
+  </div>
+  -->
 
   <h4 class="to-header">CONTACT</h4>
 

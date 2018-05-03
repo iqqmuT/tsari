@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
+from django.utils.http import urlencode
 
 from avdb.models import Convention, \
     Equipment, \
@@ -36,11 +37,41 @@ def transport_order(request, to_id):
             totals['pallet_space'] += to_line.equipment.pallet_space
             totals['footprint'] += to_line.equipment.footprint
             totals['weight'] += to_line.equipment.weight_kg()
-            
+
+    maps_url = 'https://www.google.com/maps/search/?'
+    from_qr = ''
+    to_qr = ''
+    if to.get_from_loc() is not None and to.get_from_loc().address is not None:
+        from_qr = maps_url + urlencode({
+            'api': '1',
+            'query': maps_url + to.get_from_loc().address
+        })
+
+    if to.get_to_loc() is not None and to.get_to_loc().address is not None:
+        #to_qr = maps_url + urlencode(to.get_to_loc().address, False)
+        to_qr = maps_url + urlencode({
+            'api': '1',
+            'query': to.get_to_loc().address
+        })
+
+    dir_qr = ''
+    if to.get_from_loc() is not None and to.get_to_loc() is not None:
+        dir_qr = 'https://www.google.com/maps/dir/?'
+        params = {
+            'api': '1',
+            'origin': to.get_from_loc().address,
+            'destination': to.get_to_loc().address,
+            'travelmode': 'driving',
+        }
+        dir_qr += urlencode(params)
+
     return render(request, 'docs/transport_order.html', {
         'to': to,
         'totals': totals,
         'to_lines': to_lines,
+        'from_qr': from_qr,
+        'to_qr': to_qr,
+        'dir_qr': dir_qr,
     })
 
 def _find_similar_tos(to):

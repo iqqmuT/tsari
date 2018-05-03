@@ -2,3 +2,4 @@ Django==2.0.1
 psycopg2-binary
 uwsgi
 python-dateutil
+django-qr-code
