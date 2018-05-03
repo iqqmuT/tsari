@@ -240,6 +240,10 @@ class Equipment(models.Model):
         """Returns gross weight of equipment."""
         return self.unit_field_sum('gross_weight')
 
+    def weight_kg(self):
+        """Returns gross weight of equipment."""
+        return self.weight() / 1000
+
     def get_parent_units(self):
         """Helper method for getting only parent units."""
         return self.unit_set.filter(included_in=None)

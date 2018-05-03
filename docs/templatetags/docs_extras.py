@@ -9,4 +9,4 @@ def fi_nbr(value):
 
 @register.filter
 def person(prs):
-    return mark_safe("%s<br>%s<br>%s" % (prs.name, prs.phone, prs.email))
+    return mark_safe("<strong>%s</strong><br>%s<br>%s" % (prs.name, prs.phone, prs.email))

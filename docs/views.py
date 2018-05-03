@@ -26,6 +26,7 @@ def transport_order(request, to_id):
         'units': 0,
         'pallet_space': 0,
         'footprint': 0,
+        'weight': 0,
     }
     for sto in tos:
         #logger.error('TO: %s' % sto)
@@ -34,6 +35,7 @@ def transport_order(request, to_id):
             totals['units'] += to_line.equipment.get_parent_units().count()
             totals['pallet_space'] += to_line.equipment.pallet_space
             totals['footprint'] += to_line.equipment.footprint
+            totals['weight'] += to_line.equipment.weight_kg()
             
     return render(request, 'docs/transport_order.html', {
         'to': to,
