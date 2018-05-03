@@ -400,7 +400,7 @@ def handle_equipments_file(f):
 # UNITS
 # -----
 
-unit_columns = ['Name', 'Equipment', 'Footprint', 'Pallet space', 'Equipment type', 'Dead weight', 'Net weight', 'Gross weight', 'Width', 'Height', 'Depth', 'Included in']
+unit_columns = ['Name', 'Equipment', 'Footprint', 'Pallet space', 'Unit type', 'Dead weight', 'Net weight', 'Gross weight', 'Width', 'Height', 'Depth', 'Included in']
 
 @user_passes_test(lambda u: u.is_superuser)
 def import_units(request):
@@ -522,10 +522,10 @@ def handle_units_file(f):
 
         try:
             included_in = None
-            if row[12]['val'] != '':
-                included_in = Unit.objects.get(name=row[12]['val'])
+            if row[11]['val'] != '':
+                included_in = Unit.objects.get(name=row[11]['val'])
         except ObjectDoesNotExist:
-            row[12]['error'] = 'Invalid value'
+            row[11]['error'] = 'Invalid value'
             error = True
 
         if not error:
