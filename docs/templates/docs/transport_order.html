@@ -140,11 +140,11 @@
   <table class="table table-sm table-to-details">
     <thead class="">
       <tr style="color: #fff !important; background-color: #95a5a6">
-        <th></th>
-        <th class="text-center">UNITS</th>
-        <th class="text-right">PALLET SPACE</th>
-        <th class="text-right">FOOTPRINT (m<sup>2</sup>)</th>
-        <th>TO</th>
+        <th style="width: 40%"></th>
+        <th class="text-center" style="width: 10%">UNITS</th>
+        <th class="text-right" style="width: 10%">PALLET SPACE</th>
+        <th class="text-right" style="width: 10%">FOOTPRINT (m<sup>2</sup>)</th>
+        <th style="width: 30%; padding-left: 4rem;">TO</th>
       </tr>
       <tr>
         <th>TOTAL</th>
@@ -161,7 +161,7 @@
           <td class="text-center">{{ tol.equipment.unit_set.count }}</td>
           <td class="text-right">{{ tol.equipment.pallet_space|fi_nbr }}</td>
           <td class="text-right">{{ tol.equipment.footprint|fi_nbr }}</td>
-          <td>
+          <td style="padding-left: 4rem;">
             {% if tol.transport_order.to_convention %}
               {{ tol.transport_order.to_convention.routing_name }}
             {% elif tol.transport_order.to_loc %}
