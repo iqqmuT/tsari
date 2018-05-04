@@ -100,9 +100,9 @@
       </div>
 
       {% if to.from_convention.contact_person %}
-      {{ to.from_convention.contact_person|person }}<br>
-      {% elif to.from_location.contact_person %}
-      {{ to.from_location.contact_person|person }}<br>
+        {{ to.from_convention.contact_person|person }}<br>
+      {% elif to.from_loc.contact_person %}
+        {{ to.from_loc.contact_person|person }}<br>
       {% endif %}
     </div>
 
@@ -111,9 +111,9 @@
         <strong>SHIPPING CONTACT</strong>
       </div>
       {% if to.to_convention.contact_person %}
-      {{ to.to_convention.contact_person|person }}<br>
-      {% elif to.to_location.contact_person %}
-        {{ to.to_location.contact_person|person }}<br>
+        {{ to.to_convention.contact_person|person }}<br>
+      {% elif to.to_loc.contact_person %}
+        {{ to.to_loc.contact_person|person }}<br>
       {% endif %}
     </div>
 
@@ -126,9 +126,9 @@
         <strong>TECHNICAL CONTACT</strong>
       </div>
       {% if to.from_convention.technical_contact %}
-      {{ to.from_convention.technical_contact|person }}<br>
-      {% elif to.from_location.technical_contact %}
-      {{ to.from_location.technical_contact|person }}<br>
+        {{ to.from_convention.technical_contact|person }}<br>
+      {% elif to.from_loc.technical_contact %}
+        {{ to.from_loc.technical_contact|person }}<br>
       {% endif %}
     </div>
     <div class="col-6">
@@ -138,8 +138,8 @@
       </div>
       {% if to.to_convention.technical_contact %}
         {{ to.to_convention.technical_contact|person }}
-      {% elif to.to_location.technical_contact %}
-        {{ to.to_location.technical_contact|person }}
+      {% elif to.to_loc.technical_contact %}
+        {{ to.to_loc.technical_contact|person }}
       {% endif %}
 
       <!--
@@ -179,7 +179,7 @@
       {% for tol in to_lines %}
         <tr class="table-active">
           <td class="light-grey-bg">{{ tol.equipment.name }}</td>
-          <td class="text-center light-grey-bg">{{ tol.equipment.unit_set.count }}</td>
+          <td class="text-center light-grey-bg">{{ tol.equipment.get_parent_units.count }}</td>
           <td class="text-center light-grey-bg">{{ tol.equipment.pallet_space|fi_nbr:1 }}</td>
           <td class="text-center light-grey-bg">{{ tol.equipment.footprint|fi_nbr:1 }}</td>
           <td class="text-center light-grey-bg">{{ tol.equipment.weight_kg|fi_nbr:0 }}</td>
