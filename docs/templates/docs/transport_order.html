@@ -158,14 +158,16 @@
   <h4 class="to-header">TRANSPORT DETAILS</h4>
   <table class="table table-sm table-to-details">
     <thead class="">
-      <tr style="color: #fff !important; background-color: #95a5a6">
-        <th style="width: 30%"></th>
-        <th class="text-center" style="width: 10%">UNITS</th>
-        <th class="text-center" style="width: 10%">PALLET&nbsp;SPACE</th>
-        <th class="text-center" style="width: 10%">m<sup>2</sup></th>
-        <th class="text-center" style="width: 10%">kg</th>
-        <th style="width: 30%; padding-left: 4rem;">TO</th>
+      <tr style="color: #fff !important;">
+        <th class="grey-bg" style="width: 30%"></th>
+        <th class="text-center grey-bg" style="width: 10%">UNITS</th>
+        <th class="text-center grey-bg" style="width: 10%">PALLET&nbsp;SPACE</th>
+        <th class="text-center grey-bg" style="width: 10%">m<sup>2</sup></th>
+        <th class="text-center grey-bg" style="width: 10%">kg</th>
+        <th class="grey-bg" style="width: 30%; padding-left: 4rem;">TO</th>
       </tr>
+    </thead>
+    <tbody>
       <tr>
         <th>TOTAL</th>
         <th class="text-center">{{ totals.units|fi_nbr }}</th>
@@ -174,16 +176,14 @@
         <th class="text-center">{{ totals.weight|fi_nbr }}</th>
         <th></th>
       </tr>
-    </thead>
-    <tbody>
       {% for tol in to_lines %}
         <tr class="table-active">
-          <td>{{ tol.equipment.name }}</td>
-          <td class="text-center">{{ tol.equipment.unit_set.count }}</td>
-          <td class="text-center">{{ tol.equipment.pallet_space|fi_nbr }}</td>
-          <td class="text-center">{{ tol.equipment.footprint|fi_nbr }}</td>
-          <td class="text-center">{{ tol.equipment.weight_kg|fi_nbr }}</td>
-          <td style="padding-left: 4rem;">
+          <td class="light-grey-bg">{{ tol.equipment.name }}</td>
+          <td class="text-center light-grey-bg">{{ tol.equipment.unit_set.count }}</td>
+          <td class="text-center light-grey-bg">{{ tol.equipment.pallet_space|fi_nbr }}</td>
+          <td class="text-center light-grey-bg">{{ tol.equipment.footprint|fi_nbr }}</td>
+          <td class="text-center light-grey-bg">{{ tol.equipment.weight_kg|fi_nbr }}</td>
+          <td class="light-grey-bg" style="padding-left: 4rem;">
             {% if tol.transport_order.to_convention %}
               {{ tol.transport_order.to_convention.routing_name }}
             {% elif tol.transport_order.to_loc %}

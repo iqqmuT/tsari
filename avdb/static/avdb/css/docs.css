@@ -14,3 +14,11 @@ h4.to-header {
 .table-to-details tr.equipment {
   background-color: yellow;
 }
+
+.table-to-details .grey-bg {
+  background-color: #95a5a6 !important;
+}
+
+.table-to-details .light-grey-bg {
+  background-color: #dadada !important;
+}
