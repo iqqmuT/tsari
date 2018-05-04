@@ -161,17 +161,17 @@
       <tr style="color: #fff !important; background-color: #95a5a6">
         <th style="width: 30%"></th>
         <th class="text-center" style="width: 10%">UNITS</th>
-        <th class="text-right" style="width: 10%">PALLET SPACE</th>
-        <th class="text-right" style="width: 10%">FOOTPRINT (m<sup>2</sup>)</th>
-        <th class="text-right" style="width: 10%">WEIGHT (kg)</th>
+        <th class="text-center" style="width: 10%">PALLET&nbsp;SPACE</th>
+        <th class="text-center" style="width: 10%">m<sup>2</sup></th>
+        <th class="text-center" style="width: 10%">kg</th>
         <th style="width: 30%; padding-left: 4rem;">TO</th>
       </tr>
       <tr>
         <th>TOTAL</th>
         <th class="text-center">{{ totals.units|fi_nbr }}</th>
-        <th class="text-right">{{ totals.pallet_space|fi_nbr }}</th>
-        <th class="text-right">{{ totals.footprint|fi_nbr }}</th>
-        <th class="text-right">{{ totals.weight|fi_nbr }}</th>
+        <th class="text-center">{{ totals.pallet_space|fi_nbr }}</th>
+        <th class="text-center">{{ totals.footprint|fi_nbr }}</th>
+        <th class="text-center">{{ totals.weight|fi_nbr }}</th>
         <th></th>
       </tr>
     </thead>
@@ -180,9 +180,9 @@
         <tr class="table-active">
           <td>{{ tol.equipment.name }}</td>
           <td class="text-center">{{ tol.equipment.unit_set.count }}</td>
-          <td class="text-right">{{ tol.equipment.pallet_space|fi_nbr }}</td>
-          <td class="text-right">{{ tol.equipment.footprint|fi_nbr }}</td>
-          <td class="text-right">{{ tol.equipment.weight_kg|fi_nbr }}</td>
+          <td class="text-center">{{ tol.equipment.pallet_space|fi_nbr }}</td>
+          <td class="text-center">{{ tol.equipment.footprint|fi_nbr }}</td>
+          <td class="text-center">{{ tol.equipment.weight_kg|fi_nbr }}</td>
           <td style="padding-left: 4rem;">
             {% if tol.transport_order.to_convention %}
               {{ tol.transport_order.to_convention.routing_name }}
