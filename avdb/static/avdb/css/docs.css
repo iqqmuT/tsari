@@ -20,6 +20,6 @@ h4.to-header {
   background-color: #95a5a6 !important;
 }
 
-.light-grey-bg {
+.light-grey-bg, .table-to-details .light-grey-bg {
   background-color: #dadada !important;
 }
