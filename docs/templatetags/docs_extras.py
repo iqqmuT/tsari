@@ -13,3 +13,7 @@ def fi_nbr(value, decimals=None):
 @register.filter
 def person(prs):
     return mark_safe("<strong>%s</strong><br>%s<br>%s" % (prs.name, prs.phone, prs.email))
+
+@register.filter
+def to_notes(notes):
+    return mark_safe(notes.replace("\n", '<br>'))

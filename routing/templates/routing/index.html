@@ -168,7 +168,8 @@
 
           <div class="form-group">
             <label for="to-notes">Notes</label>
-            <input id="to-notes" type="text" class="form-control">
+            <!-- <input id="to-notes" type="text" class="form-control"> -->
+            <textarea id="to-notes" class="form-control"></textarea>
           </div>
 
           <!--
@@ -410,7 +411,7 @@ function openTOModal(toIdx) {
 function fillModalFields(toIdx) {
   var to = toData[toIdx];
   $('#to-name').val(to.name);
-  $('#to-notes').val(to.notes);
+  $('#to-notes').html(to.notes);
   $('#to-unit-notes').val(to.unitNotes);
 
   var fromConvention = getTOFromField(toIdx, 'convention');
