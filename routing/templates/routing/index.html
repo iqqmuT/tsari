@@ -5,7 +5,20 @@
 {% load i18n %}
 {% load routing_extras %}
 
-<h1>Equipment Routing {{ year }}</h1>
+
+<h1>
+  Equipment Routing {{ year }}
+</h1>
+
+<div class="text-center d-print-none sticky-top" style="width: 100%;">
+  <div class="" style="margin-left: auto; margin-right: auto; margin-bottom: 25px;">
+    <button class="btn btn-primary btn-lg" id="save-button">
+      <i class="fas fa-check" style="margin-right: 5px;"></i>
+      Save
+    </button>
+  </div>
+</div>
+
 
 <form class="form">
 {% csrf_token %}
@@ -125,12 +138,6 @@
   </tbody>
 </table>
 </form>
-
-<div class="row d-print-none">
-  <div class="col">
-    <button class="btn btn-primary btn-lg" id="save-button" style="margin-left: 25px;">Save</button>
-  </div>
-</div>
 
 <!-- Transport Order modal -->
 <div id="to-modal" class="modal" tabindex="-1" role="dialog">

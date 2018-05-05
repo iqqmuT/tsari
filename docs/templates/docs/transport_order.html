@@ -11,33 +11,28 @@
     {% qr_from_text dir_qr size="t" %}
   </div>
 
-  <div class="text-center">
+  <div class="text-center" style="margin-top: 1rem; margin-bottom: 2rem;">
     <h1>TRANSPORT ORDER</h1>
-    <h4>{{ to.name }}
-      ({{ to.get_from_loc.abbreviation }} &mdash; {{ to.get_to_loc.abbreviation }})
-    </h4>
   </div> <!-- .row -->
 
-      <div class="row">
-        <div class="col-1">From:</div>
-        <div class="col-11">
-          {% if to.from_convention %}{{ to.from_convention.name }}{% elif to.from_loc %}{{ to.from_loc.name }}{% endif %}
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-1">To:</div>
-        <div class="col-11">
-          {% if to.to_convention %}{{ to.to_convention.name }}{% elif to.to_loc %}{{ to.to_loc.name }}{% endif %}
-        </div>
-      </div>
-
+  <div class="row">
+    <div class="col-6">
+      <h4>
+        From: {{ to.get_from_loc.name }}
+      </h4>
+    </div>
+    <div class="col-6">
+      <h4>
+        To: {{ to.get_to_loc.name }}
+      </h4>
+    </div>
+  </div>
 
   <h4 class="to-header">SHIPPING</h4>
 
   <div class="row">
     <div class="col-6">
-      <div class="p-1 mb-2 bg-secondary text-white">
+      <div class="p-1 mb-2 light-grey-bg">
         <strong>LOADING</strong>
       </div>
 
@@ -59,7 +54,7 @@
     </div>
 
     <div class="col-6">
-      <div class="p-1 mb-2 bg-secondary text-white">
+      <div class="p-1 mb-2 light-grey-bg">
         <strong>UNLOADING</strong>
       </div>
 
@@ -95,7 +90,7 @@
 
   <div class="row">
     <div class="col-6">
-      <div class="p-1 mb-2 bg-secondary text-white">
+      <div class="p-1 mb-2 light-grey-bg">
         <strong>SHIPPING CONTACT</strong>
       </div>
 
@@ -107,7 +102,7 @@
     </div>
 
     <div class="col-6">
-      <div class="p-1 mb-2 bg-secondary text-white">
+      <div class="p-1 mb-2 light-grey-bg">
         <strong>SHIPPING CONTACT</strong>
       </div>
       {% if to.to_convention.contact_person %}
@@ -122,7 +117,7 @@
   <div class="row" style="margin-top: 1rem;">
     <div class="col-6">
 
-      <div class="p-1 mb-2 bg-secondary text-white">
+      <div class="p-1 mb-2 light-grey-bg">
         <strong>TECHNICAL CONTACT</strong>
       </div>
       {% if to.from_convention.technical_contact %}
@@ -133,7 +128,7 @@
     </div>
     <div class="col-6">
 
-      <div class="p-1 mb-2 bg-secondary text-white">
+      <div class="p-1 mb-2 light-grey-bg">
         <strong>TECHNICAL CONTACT</strong>
       </div>
       {% if to.to_convention.technical_contact %}
@@ -153,18 +148,18 @@
   </div>
 
   <h4 class="to-header">NOTES</h4>
-  <p>{{ to.notes }}</p>
+  <p>{{ to.notes }}Hassua tekstiä.</p>
 
-  <h4 class="to-header">TRANSPORT DETAILS</h4>
+  <h4 class="to-header" style="margin-top: 2rem;">TRANSPORT DETAILS</h4>
   <table class="table table-sm table-to-details">
     <thead class="">
       <tr style="color: #fff !important;">
-        <th class="grey-bg" style="width: 30%"></th>
+        <th class="grey-bg" style="width: 35%"></th>
         <th class="text-center grey-bg" style="width: 10%">UNITS</th>
         <th class="text-center grey-bg" style="width: 10%">PALLET&nbsp;SPACE</th>
         <th class="text-center grey-bg" style="width: 10%">m<sup>2</sup></th>
         <th class="text-center grey-bg" style="width: 10%">kg</th>
-        <th class="grey-bg" style="width: 30%; padding-left: 4rem;">TO</th>
+        <th class="grey-bg" style="width: 25%; padding-left: 4rem;">TO</th>
       </tr>
     </thead>
     <tbody>
@@ -178,7 +173,7 @@
       </tr>
       {% for tol in to_lines %}
         <tr class="table-active">
-          <td class="light-grey-bg">{{ tol.equipment.name }}</td>
+          <td class="light-grey-bg text-nowrap">{{ tol.equipment.name }}</td>
           <td class="text-center light-grey-bg">{{ tol.equipment.get_parent_units.count }}</td>
           <td class="text-center light-grey-bg">{{ tol.equipment.pallet_space|fi_nbr:1 }}</td>
           <td class="text-center light-grey-bg">{{ tol.equipment.footprint|fi_nbr:1 }}</td>
@@ -193,7 +188,7 @@
         </tr>
         {% for unit in tol.equipment.get_parent_units %}
           <tr class="unit">
-            <td>&#11036; {{ unit.name }}</td>
+            <td class="text-nowrap">&#11036; {{ unit.name }}</td>
             <td></td>
             <td></td>
             <td></td>

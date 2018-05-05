@@ -9,6 +9,7 @@ h4.to-header {
   background-color: #3498DB !important;
   line-height: 1.5;
   margin-top: 1rem;
+  font-weight: bolder;
 }
 
 .table-to-details tr.equipment {
@@ -19,6 +20,6 @@ h4.to-header {
   background-color: #95a5a6 !important;
 }
 
-.table-to-details .light-grey-bg {
+.light-grey-bg {
   background-color: #dadada !important;
 }
