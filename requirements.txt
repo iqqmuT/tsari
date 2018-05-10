@@ -3,3 +3,4 @@ psycopg2-binary
 uwsgi
 python-dateutil
 django-qr-code
+pillow
