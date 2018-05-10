@@ -28,6 +28,7 @@ def transport_order(request, to_id):
         'pallet_space': 0,
         'footprint': 0,
         'weight': 0,
+        'capacity': 0,
     }
     for sto in tos:
         #logger.error('TO: %s' % sto)
@@ -37,6 +38,7 @@ def transport_order(request, to_id):
             totals['pallet_space'] += to_line.equipment.pallet_space
             totals['footprint'] += to_line.equipment.footprint
             totals['weight'] += to_line.equipment.weight_kg()
+            totals['capacity'] += to_line.equipment.capacity()
 
     maps_url = 'https://www.google.com/maps/search/?'
     from_qr = ''

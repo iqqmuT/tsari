@@ -244,6 +244,12 @@ class Equipment(models.Model):
         """Returns gross weight of equipment."""
         return self.weight() / 1000
 
+    def capacity(self):
+        capacity = 0
+        for unit in self.get_parent_units():
+            capacity += unit.capacity()
+        return capacity
+
     def get_parent_units(self):
         """Helper method for getting only parent units."""
         return self.unit_set.filter(included_in=None)
@@ -354,6 +360,12 @@ class Unit(models.Model):
         #elif self.equipment is not None:
         # no parent unit, update equipment gross weight
         #    self.equipment.update_gross_weight()
+
+    def capacity(self):
+        """Returns capacity of unit in mm^3."""
+        if self.width is not None and self.height is not None and self.depth is not None:
+            return self.width * self.height * self.depth
+        return 0
 
 class TransportOrderUnit(models.Model):
     transport_order = models.ForeignKey(TransportOrder, on_delete=models.CASCADE)
