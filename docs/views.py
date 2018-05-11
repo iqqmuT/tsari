@@ -40,6 +40,9 @@ def transport_order(request, to_id):
             totals['weight'] += to_line.equipment.weight_kg()
             totals['capacity'] += to_line.equipment.capacity()
 
+    # sort to_lines by equipment name
+    to_lines = sorted(to_lines, key=lambda to_line: to_line.equipment.name)
+
     maps_url = 'https://www.google.com/maps/search/?'
     from_qr = ''
     to_qr = ''

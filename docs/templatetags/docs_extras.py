@@ -25,6 +25,6 @@ def greek_talents(kg):
 @register.filter
 def bib_capacity(capacity):
     ephahs = capacity / 1000000 / 22
-    if ephahs > 10:
-        return "%d homers" % int(round(ephahs / 10))
+    #if ephahs > 10:
+    #    return "%d homers" % int(round(ephahs / 10))
     return "%d ephahs" % int(round(ephahs))
