@@ -40,8 +40,8 @@ def transport_order(request, to_id):
             totals['footprint'] += to_line.equipment.footprint
             totals['weight'] += to_line.equipment.weight_kg()
             totals['capacity'] += to_line.equipment.capacity()
-            if to_line.equipment.max_height() / 100 > totals['max_height']:
-                totals['max_height'] = to_line.equipment.max_height() / 100
+            if to_line.equipment.max_height() / 1000 > totals['max_height']:
+                totals['max_height'] = to_line.equipment.max_height() / 1000
 
     # sort to_lines by equipment name
     to_lines = sorted(to_lines, key=lambda to_line: to_line.equipment.name)
