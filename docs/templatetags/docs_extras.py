@@ -6,8 +6,10 @@ register = template.Library()
 @register.filter
 def fi_nbr(value, decimals=None):
     if decimals is not None:
-        s = "{:0.%df}" % decimals
-        value = s.format(value)
+        s = "{:0,.%df}" % decimals
+    else:
+        s = "{:0,.0f}"
+    value = s.format(value).replace(',', ' ')
     return str(value).replace('.', ',')
 
 @register.filter

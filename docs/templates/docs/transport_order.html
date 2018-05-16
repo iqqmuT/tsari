@@ -166,7 +166,7 @@
       <tr>
         <th>TOTAL</th>
         <th class="text-center">{{ totals.units|fi_nbr }}</th>
-        <th class="text-center">{{ totals.pallet_space|fi_nbr:1 }}</th>
+        <th class="text-center">{{ totals.pallet_space|fi_nbr:0 }}</th>
         <th class="text-center">{{ totals.footprint|fi_nbr:1 }}</th>
         <th class="text-center">{{ totals.weight|fi_nbr:0 }}</th>
         <th></th>
@@ -175,7 +175,7 @@
         <tr class="table-active">
           <td class="text-nowrap light-grey-bg">{{ tol.equipment.name }}</td>
           <td class="text-center light-grey-bg">{{ tol.equipment.get_parent_units.count }}</td>
-          <td class="text-center light-grey-bg">{{ tol.equipment.pallet_space|fi_nbr:1 }}</td>
+          <td class="text-center light-grey-bg">{{ tol.equipment.pallet_space|fi_nbr:0 }}</td>
           <td class="text-center light-grey-bg">{{ tol.equipment.footprint|fi_nbr:1 }}</td>
           <td class="text-center light-grey-bg">{{ tol.equipment.weight_kg|fi_nbr:0 }}</td>
           <td class="light-grey-bg" style="padding-left: 4rem;">
