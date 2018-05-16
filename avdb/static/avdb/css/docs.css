@@ -23,3 +23,7 @@ h4.to-header {
 .light-grey-bg, .table-to-details .light-grey-bg {
   background-color: #dadada !important;
 }
+
+.table-to-details .total-row {
+  line-height: 3rem;
+}
