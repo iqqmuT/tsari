@@ -255,7 +255,7 @@ class Equipment(models.Model):
         height = 0
         for unit in self.get_parent_units():
             if unit.height is not None and unit.height > height:
-                height = unit.height()
+                height = unit.height
         return height
 
     def get_parent_units(self):
