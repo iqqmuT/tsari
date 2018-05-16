@@ -29,6 +29,7 @@ def transport_order(request, to_id):
         'footprint': 0,
         'weight': 0,
         'capacity': 0,
+        'max_height': 0,
     }
     for sto in tos:
         #logger.error('TO: %s' % sto)
@@ -39,6 +40,8 @@ def transport_order(request, to_id):
             totals['footprint'] += to_line.equipment.footprint
             totals['weight'] += to_line.equipment.weight_kg()
             totals['capacity'] += to_line.equipment.capacity()
+            if to_line.equipment.max_height() > totals['max_height']:
+                totals['max_height'] = to_line.equipment.max_height()
 
     # sort to_lines by equipment name
     to_lines = sorted(to_lines, key=lambda to_line: to_line.equipment.name)

@@ -250,6 +250,14 @@ class Equipment(models.Model):
             capacity += unit.capacity()
         return capacity
 
+    def max_height(self):
+        """Returns maximum height of parent units."""
+        height = 0
+        for unit in self.get_parent_units():
+            if unit.height is not None and unit.height > height:
+                height = unit.height()
+        return height
+
     def get_parent_units(self):
         """Helper method for getting only parent units."""
         return self.unit_set.filter(included_in=None)
