@@ -102,7 +102,7 @@ def index(request, year):
 def _add_eq_group(equipment_types, weeks, to_data):
     groups = []
     for eq_type in equipment_types:
-        eqs = Equipment.objects.filter(equipment_type=eq_type)
+        eqs = Equipment.objects.filter(equipment_type=eq_type, disabled=False)
         groups.append(_handle_equipments(eqs, weeks, to_data))
     return groups
 

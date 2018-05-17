@@ -209,7 +209,10 @@ class Equipment(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return "%d - %s" % (self.id, self.name)
+        s = "%d - %s" % (self.id, self.name)
+        if self.disabled:
+            s += ' [DISABLED]'
+        return s
 
     class Meta:
         ordering = ['name']
