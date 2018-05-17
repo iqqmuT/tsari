@@ -89,7 +89,7 @@
   </div>
   -->
 
-  <h4 class="to-header">CONTACT</h4>
+  <h4 class="to-header">CONTACTS</h4>
 
   <div class="row">
     <div class="col-6">
@@ -149,6 +149,36 @@
       -->
     </div>
   </div>
+  <!--
+  <div class="p-1 mb-2 light-grey-bg text-center" style="margin-top: 1rem;">
+    <strong>BRANCH</strong>
+  </div>
+
+  <div class="row" style="margin-top: 1rem;">
+    <div class="col-6">
+
+      <div class="p-1 mb-2 light-grey-bg">
+        <strong>SHIPPING CONTACT</strong>
+      </div>
+      {% if to.from_convention.technical_contact %}
+        {{ to.from_convention.technical_contact|person }}<br>
+      {% elif to.from_loc.technical_contact %}
+        {{ to.from_loc.technical_contact|person }}<br>
+      {% endif %}
+    </div>
+    <div class="col-6">
+
+      <div class="p-1 mb-2 light-grey-bg">
+        <strong>TECHNICAL CONTACT</strong>
+      </div>
+      {% if to.to_convention.technical_contact %}
+        {{ to.to_convention.technical_contact|person }}
+      {% elif to.to_loc.technical_contact %}
+        {{ to.to_loc.technical_contact|person }}
+      {% endif %}
+    </div>
+  </div>
+  -->
 
   <h4 class="to-header">NOTES</h4>
   <p>{{ to.notes|to_notes }}</p>
