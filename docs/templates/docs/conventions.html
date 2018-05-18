@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+{% load i18n %}
+{% load docs_extras %}
+{% load qr_code %}
+
+<div class="container">
+
+  <div class="row">
+    <div class="col">
+      <h3>Conventions {{ year }}</h3>
+      {% for convention in conventions %}
+        <a href="../../convention_equipments/{{ convention.pk }}/">
+          {{ convention }}</a><br>
+      {% endfor %}
+    </div>
+  </div>
+
+</div> <!-- .container -->
+
+
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+$(document).ready(function() {
+});
+</script>
+
+{% endblock %}

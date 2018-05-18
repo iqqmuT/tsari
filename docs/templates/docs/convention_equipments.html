@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+{% load i18n %}
+{% load docs_extras %}
+{% load qr_code %}
+
+<div class="container to-container">
+
+
+<table style="width: 100%;">
+  <thead>
+    <tr>
+      <td>FINLAND BRANCH 2018</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+
+
+  <div class="text-center" style="margin-top: 2rem; margin-bottom: 3rem;">
+    <h1>CONVENTION EQUIPMENT LIST</h1>
+    {% if convention.name %}
+      <h3>{{ convention.routing_name }}</h3>
+    {% endif %}
+  </div> <!-- .row -->
+
+  <div class="row">
+    <div class="col-6">
+      <div class="p-1 mb-2 light-grey-bg">
+        <strong>LOAD IN</strong>
+      </div>
+      <strong>
+        {% if convention.load_in %}
+          {{ convention.load_in|date:"j.n.Y H:i" }}
+        {% else %}
+          &mdash;
+        {% endif %}
+      </strong>
+    </div>
+
+    <div class="col-6">
+
+      <div class="p-1 mb-2 light-grey-bg">
+        <strong>LOAD OUT</strong>
+      </div>
+      <strong>
+        {% if convention.load_out %}
+          {{ convention.load_out|date:"j.n.Y H:i" }}
+        {% else %}
+          &mdash;
+        {% endif %}
+      </strong>
+    </div>
+
+  </div>
+
+  <div class="row" style="margin-top: 1rem;">
+    <div class="col-6">
+      <div class="p-1 mb-2 light-grey-bg">
+        <strong>START DATE</strong>
+      </div>
+      <strong>
+        {% if convention.starts %}
+          {{ convention.starts|date:"j.n.Y" }}
+        {% else %}
+          &mdash;
+        {% endif %}
+      </strong>
+    </div>
+
+    <div class="col-6">
+
+      <div class="p-1 mb-2 light-grey-bg">
+        <strong>END DATE</strong>
+      </div>
+      <strong>
+        {% if convention.ends %}
+          {{ convention.ends|date:"j.n.Y" }}
+        {% else %}
+          &mdash;
+        {% endif %}
+      </strong>
+    </div>
+
+  </div>
+
+  <h4 class="to-header">CONTACTS</h4>
+
+  <div class="row">
+    <div class="col-6">
+      <div class="p-1 mb-2 light-grey-bg">
+        <strong>SHIPPING</strong>
+      </div>
+
+      {% if convention.contact_person %}
+        {{ convention.contact_person|person }}<br>
+      {% endif %}
+    </div>
+
+    <div class="col-6">
+
+      <div class="p-1 mb-2 light-grey-bg">
+        <strong>TECHNICAL</strong>
+      </div>
+      {% if convention.technical_contact %}
+        {{ convention.technical_contact|person }}<br>
+      {% endif %}
+    </div>
+
+  </div>
+
+
+
+
+  <h4 class="to-header" style="margin-top: 2rem;">TRANSPORT DETAILS</h4>
+  <p>
+    Equipment maximum height for transit: {{ totals.max_height|fi_nbr:2 }} m
+  </p>
+  <table class="table table-sm table-to-details">
+    <thead class="">
+      <tr style="color: #fff !important;">
+        <th class="grey-bg" style="width: 60%"></th>
+        <th class="text-center grey-bg" style="width: 10%">UNITS</th>
+        <th class="text-center grey-bg" style="width: 10%">PALLET&nbsp;SPACE</th>
+        <th class="text-center grey-bg" style="width: 10%">SQM</th>
+        <th class="text-center grey-bg" style="width: 10%">KG</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="total-row">
+        <th>TOTAL</th>
+        <th class="text-center">{{ totals.units|fi_nbr }}</th>
+        <th class="text-center">{{ totals.pallet_space|fi_nbr:0 }}</th>
+        <th class="text-center">{{ totals.footprint|fi_nbr:2 }}</th>
+        <th class="text-center">{{ totals.weight|fi_nbr:0 }}</th>
+      </tr>
+      {% for tol in to_lines %}
+        <tr class="table-active">
+          <td class="text-nowrap light-grey-bg">{{ tol.equipment.name }}</td>
+          <td class="text-center light-grey-bg">{{ tol.equipment.get_parent_units.count }}</td>
+          <td class="text-center light-grey-bg">{{ tol.equipment.pallet_space|fi_nbr:0 }}</td>
+          <td class="text-center light-grey-bg">{{ tol.equipment.footprint|fi_nbr:2 }}</td>
+          <td class="text-center light-grey-bg">{{ tol.equipment.weight_kg|fi_nbr:0 }}</td>
+        </tr>
+        {% for unit in tol.equipment.get_parent_units %}
+          <tr class="unit">
+            <td class="text-nowrap">&#11036; {{ unit.name }}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        {% endfor %}
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p class="text-primary">
+    <small>
+      In alternative units: {{ totals.capacity|bib_capacity }},
+      {{ totals.weight|greek_talents }} Greek talents.
+    </small>
+  </p>
+
+
+      </td> <!-- content cell -->
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td>
+        Printed on {{ convention.load_in|date:"j.n.Y H:i" }}
+      </td>
+    </tr>
+  </tfoot>
+</table>
+
+
+
+</div> <!-- .container -->
+
+
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+$(document).ready(function() {
+});
+</script>
+
+{% endblock %}
