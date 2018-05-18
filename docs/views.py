@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from django.db.models import Q
 from django.contrib.auth.decorators import user_passes_test
@@ -33,7 +33,7 @@ def transport_order(request, to_id):
     }
     for sto in tos:
         #logger.error('TO: %s' % sto)
-        for to_line in sto.transportorderline_set.all():
+        for to_line in sto.transportorderline_set.filter(equipment__disabled=False):
             to_lines.append(to_line)
             totals['units'] += to_line.equipment.get_parent_units().count()
             totals['pallet_space'] += to_line.equipment.pallet_space
@@ -82,6 +82,54 @@ def transport_order(request, to_id):
         'dir_qr': dir_qr,
     })
 
+@user_passes_test(lambda u: u.is_superuser)
+def conventions(request, year):
+    conventions = Convention.objects.filter(starts__year=year)
+    return render(request, 'docs/conventions.html', {
+        'year': year,
+        'conventions': conventions,
+    })
+ 
+@user_passes_test(lambda u: u.is_superuser)
+def convention_equipments(request, pk):
+    convention = get_object_or_404(Convention, pk=pk)
+    tos = TransportOrder.objects.filter(disabled=False).filter(
+            Q(from_convention=convention) | Q(to_convention=convention))
+
+    # all transport order lines
+    to_lines = []
+    # calculate totals
+    totals = {
+        'units': 0,
+        'pallet_space': 0,
+        'footprint': 0,
+        'weight': 0,
+        'capacity': 0,
+        'max_height': 0,
+    }
+    for sto in tos:
+        #logger.error('TO: %s' % sto)
+        for to_line in sto.transportorderline_set.filter(equipment__disabled=False):
+            to_lines.append(to_line)
+            totals['units'] += to_line.equipment.get_parent_units().count()
+            totals['pallet_space'] += to_line.equipment.pallet_space
+            totals['footprint'] += to_line.equipment.footprint
+            totals['weight'] += to_line.equipment.weight_kg()
+            totals['capacity'] += to_line.equipment.capacity()
+            if to_line.equipment.max_height() / 1000 > totals['max_height']:
+                totals['max_height'] = to_line.equipment.max_height() / 1000
+
+    # sort to_lines by equipment name
+    to_lines = sorted(to_lines, key=lambda to_line: to_line.equipment.name)
+
+    return render(request, 'docs/convention_equipments.html', {
+        'convention': convention,
+        'equipments': [],
+        'totals': totals,
+        'to_lines': to_lines,
+        'now': datetime.now(),
+    })
+ 
 def _find_similar_tos(to):
     """Returns similar TOs which share same load in and out times, and locations."""
     tos = TransportOrder.objects.filter(
