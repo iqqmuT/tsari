@@ -33,8 +33,8 @@ urlpatterns = [
     path('routing/<int:year>/', routing_views.index, name='routing_index'),
     path('routing/<int:year>/save', routing_views.save, name='routing_save'),
     path('docs/transport_order/<int:to_id>/', docs_views.transport_order, name='docs_transport_order'),
-    path('docs/conventions/<int:year>/', docs_views.conventions, name='docs_conventions'),
-    path('docs/convention_equipments/<int:pk>/', docs_views.convention_equipments, name='docs_convention_equipments'),
+    #path('docs/conventions/<int:year>/', docs_views.conventions, name='docs_conventions'),
+    #path('docs/convention_equipments/<int:pk>/', docs_views.convention_equipments, name='docs_convention_equipments'),
     path('table_test/', avdb_views.table_test, name='table_test'),
     path('start/', avdb_views.start, name='start'),
 ]
