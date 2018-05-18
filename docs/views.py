@@ -93,8 +93,7 @@ def conventions(request, year):
 @user_passes_test(lambda u: u.is_superuser)
 def convention_equipments(request, pk):
     convention = get_object_or_404(Convention, pk=pk)
-    tos = TransportOrder.objects.filter(disabled=False).filter(
-            Q(from_convention=convention) | Q(to_convention=convention))
+    tos = TransportOrder.objects.filter(disabled=False, to_convention=convention)
 
     # all transport order lines
     to_lines = []
