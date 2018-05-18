@@ -8,3 +8,6 @@ def start(request):
     return render(request, 'avdb/start.html', {
         'locations': locations,
     })
+
+def table_test(request):
+    return render(request, 'avdb/table_test.html', {})

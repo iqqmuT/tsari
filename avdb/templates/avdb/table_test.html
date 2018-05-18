@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+{% load i18n %}
+{% load docs_extras %}
+{% load qr_code %}
+
+<div class="container to-container">
+
+  <table style="width: 100%;">
+    <thead>
+      <tr>
+        <td>HEADER</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+
+          <div class="text-center" style="margin-top: 2rem; margin-bottom: 3rem;">
+            <h1>CONVENTION EQUIPMENT LIST</h1>
+            <div style="height: 500px">a</div>
+            <div style="height: 500px">b</div>
+            <div style="height: 500px">c</div>
+            <div style="height: 500px">d</div>
+            <div style="height: 500px">e</div>
+            <div style="height: 500px">f</div>
+          </div> <!-- .row -->
+
+        </td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td>FOOTER</td>
+      </tr>
+    </tfoot>
+  </table>
+
+</div> <!-- .container -->
+
+{% endblock %}
