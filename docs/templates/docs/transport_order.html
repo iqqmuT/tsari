@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block title %}TO {{ to.name }} {{ to.get_from_loc.abbreviation }}-{{ to.get_to_loc.abbreviation }}{% endblock %}
+
 {% block main %}
 
 {% load i18n %}
