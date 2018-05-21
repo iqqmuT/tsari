@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+{% load i18n %}
+
+<style>
+  .to-list-link:visited {
+    color: black;
+  }
+</style>
+<div class="container">
+  <h1>Transport Orders</h1>
+
+  {% for to in tos %}
+    <a href="/docs/transport_order/{{ to.pk }}/" target="to_{{ to.pk }}" class="to-list-link">
+      {{ to }}</a>
+    <br>
+  {% endfor %}
+</div> <!-- .container -->
+
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+$(document).ready(function() {
+});
+</script>
+
+{% endblock %}

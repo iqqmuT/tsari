@@ -16,6 +16,22 @@ import logging
 logger = logging.getLogger(__name__)
 
 @user_passes_test(lambda u: u.is_superuser)
+def transport_orders(request):
+    tos = TransportOrder.objects.filter(disabled=False)
+    to_ids = []
+    all_similar = set()
+    for to in tos:
+        if to not in all_similar:
+            similar = _find_similar_tos(to)
+            to_ids.append(similar[0])
+            for s in similar:
+                all_similar.add(s)
+
+    return render(request, 'docs/transport_orders.html', {
+        'tos': to_ids,
+    })
+
+@user_passes_test(lambda u: u.is_superuser)
 def transport_order(request, to_id):
     to = get_object_or_404(TransportOrder, pk=to_id)
     tos = _find_similar_tos(to)
