@@ -435,16 +435,8 @@ class Item(models.Model):
 
     def __str__(self):
         if self.serial_number != "":
-            return "%s - %s" % (self.item_class.name, self.serial_number)
-        return self.item_class.name
-
-    def save(self, *args, **kwargs):
-        # Calling the real save() method
-        super().save(*args, **kwargs)
-
-        # update unit weight fields
-        if self.unit is not None:
-            self.unit.update_weight()
+            return "%s %s - %s" % (self.name, self.serial_number)
+        return self.name
 
     class Meta:
         ordering = ['name', 'serial_number']

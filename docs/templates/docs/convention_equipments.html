@@ -153,6 +153,15 @@
             <td></td>
             <td></td>
           </tr>
+          {% for item in unit.item_set.all %}
+            <tr class="item">
+              <td class="text-nowrap item-name" style="padding-left: 2rem;">&#11036; {{ item.name }}</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          {% endfor %}
         {% endfor %}
       {% endfor %}
     </tbody>
