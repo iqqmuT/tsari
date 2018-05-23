@@ -312,7 +312,7 @@ class Unit(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return "%d - %s" % (self.pk, self.name)
 
     class Meta:
         ordering = ['name']
@@ -434,9 +434,10 @@ class Item(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
+        s = "%d - %s" % (self.pk, self.name)
         if self.serial_number != "":
-            return "%s %s - %s" % (self.name, self.serial_number)
-        return self.name
+            s = "%s - %s" % (s, self.serial_number)
+        return s
 
     class Meta:
         ordering = ['name', 'serial_number']
