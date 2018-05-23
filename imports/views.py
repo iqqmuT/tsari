@@ -728,14 +728,14 @@ def handle_items_file(f):
             row[0]['error'] = 'Invalid value'
             error = True
 
-        built_in_unit = row[5]['val'] != ''
+        built_in_unit = row[4]['val'] != ''
 
         try:
             unit = None
-            if row[4]['val'] != '':
-                unit = Unit.objects.get(pk=row[4]['val'])
+            if row[3]['val'] != '':
+                unit = Unit.objects.get(pk=row[3]['val'])
         except ObjectDoesNotExist:
-            row[4]['error'] = 'Invalid value'
+            row[3]['error'] = 'Invalid value'
             error = True
 
         if not error:
@@ -746,7 +746,7 @@ def handle_items_file(f):
                 serial_number=row[2]['val'],
                 unit=unit,
                 built_in_unit=built_in_unit,
-                qrid=row[6]['val'],
+                qrid=row[5]['val'],
             )
             item.save()
             imported.append(item)
