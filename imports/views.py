@@ -723,7 +723,7 @@ def handle_items_file(f):
         error = False
 
         try:
-            item_class = ItemClass.objects.get(name=row[0]['val'])
+            item_class = ItemClass.objects.get(description=row[0]['val'])
         except InvalidOperation:
             row[0]['error'] = 'Invalid value'
             error = True
