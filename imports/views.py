@@ -733,7 +733,7 @@ def handle_items_file(f):
         try:
             unit = None
             if row[4]['val'] != '':
-                unit = Unit.objects.get(name=row[4]['val'])
+                unit = Unit.objects.get(pk=row[4]['val'])
         except ObjectDoesNotExist:
             row[4]['error'] = 'Invalid value'
             error = True
