@@ -365,9 +365,9 @@ class Unit(models.Model):
         # Calling the real save() method
         super().save(*args, **kwargs)
 
-        if self.included_in is not None:
+        #if self.included_in is not None:
             # update parent unit weight
-            self.included_in.update_weight()
+        #    self.included_in.update_weight()
         #elif self.equipment is not None:
         # no parent unit, update equipment gross weight
         #    self.equipment.update_gross_weight()
