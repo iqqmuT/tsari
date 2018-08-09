@@ -16,8 +16,18 @@ import logging
 logger = logging.getLogger(__name__)
 
 @user_passes_test(lambda u: u.is_superuser)
-def transport_orders(request):
-    tos = TransportOrder.objects.filter(disabled=False)
+def transport_orders(request, year):
+    start = datetime(year, 1, 1)
+    end = datetime(year, 12, 31, 23, 59, 59)
+
+    tos = TransportOrder.objects.filter(
+        Q(from_loc_load_out__range=(start, end)) |
+        Q(to_loc_load_in__range=(start, end)) |
+        Q(from_convention__load_out__range=(start, end)) |
+        Q(to_convention__load_in__range=(start, end))
+    ).filter(disabled=False).order_by('created')
+
+    #tos = TransportOrder.objects.filter(disabled=False)
     to_ids = []
     all_similar = set()
     for to in tos:
@@ -29,6 +39,7 @@ def transport_orders(request):
 
     return render(request, 'docs/transport_orders.html', {
         'tos': to_ids,
+        'year': year,
     })
 
 @user_passes_test(lambda u: u.is_superuser)
