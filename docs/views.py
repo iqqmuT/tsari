@@ -37,6 +37,9 @@ def transport_orders(request, year):
             for s in similar:
                 all_similar.add(s)
 
+    # sort list of transport orders alphabetically
+    to_ids.sort(key=lambda to: str(to))
+
     return render(request, 'docs/transport_orders.html', {
         'tos': to_ids,
         'year': year,
