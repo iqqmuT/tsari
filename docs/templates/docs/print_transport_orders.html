@@ -34,6 +34,8 @@
         <div class="p-1 mb-2 light-grey-bg">
           <strong>LOADING FROM</strong>
         </div>
+        {{ to.get_from_loc.name }}
+        <br>
 
         <strong>
         {% if to.from_convention.load_out %}
@@ -56,6 +58,9 @@
         <div class="p-1 mb-2 light-grey-bg">
           <strong>UNLOADING TO</strong>
         </div>
+
+        {{ to.get_to_loc.name }}
+        <br>
 
         <strong>
         {% if to.to_convention.load_in %}
