@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}TRANSPORT LIST {{ year }}{% endblock %}
+
+{% block main %}
+
+{% load i18n %}
+{% load docs_extras %}
+
+<style>
+  .to-list-link:visited {
+    color: black;
+  }
+</style>
+<div class="container to-container">
+  <div class="text-center" style="margin-top: 2rem; margin-bottom: 2rem;">
+    <h1>TRANSPORT LIST {{ year }}</h1>
+    {% if to.name %}
+      <h3>{{ to.name }}</h3>
+    {% endif %}
+  </div> <!-- .row -->
+
+  {% for to in tos %}
+    <h4 class="to-header" style="margin-top: 3rem;">
+       {% if to.name %}
+        {{ to.name }}
+      {% else %}
+        &nbsp;
+      {% endif %}
+    </h4>
+
+    <div class="row">
+      <div class="col-6">
+        <div class="p-1 mb-2 light-grey-bg">
+          <strong>LOADING FROM</strong>
+        </div>
+
+        <strong>
+        {% if to.from_convention.load_out %}
+          {{ to.from_convention.load_out|date:"j.n.Y H:i" }}
+        {% else %}
+          {{ to.from_loc_load_out|date:"j.n.Y H:i" }}
+        {% endif %}
+        </strong>
+        <br>
+
+        {{ to.get_from_loc.address }}
+
+        {% if to.get_from_loc.entrance %}
+          <br>
+          {{ to.get_from_loc.entrance }}
+        {% endif %}
+      </div>
+
+      <div class="col-6">
+        <div class="p-1 mb-2 light-grey-bg">
+          <strong>UNLOADING TO</strong>
+        </div>
+
+        <strong>
+        {% if to.to_convention.load_in %}
+          {{ to.to_convention.load_in|date:"j.n.Y H:i" }}
+        {% else %}
+          {{ to.to_loc_load_in|date:"j.n.Y H:i" }}
+        {% endif %}
+        </strong>
+        <br>
+
+        {{ to.get_to_loc.address }}
+
+        {% if to.get_to_loc.entrance %}
+          <br>
+          {{ to.get_to_loc.entrance }}
+        {% endif %}
+      </div>
+    </div>
+
+
+    <!-- <h4 class="to-header" style="margin-top: 2rem;">TRANSPORT DETAILS</h4> -->
+    <table class="table table-sm table-to-details" style="margin-top: 1rem;">
+      <thead class="">
+        <tr style="color: #fff !important;">
+          <th class="grey-bg" style="width: 40%"></th>
+          <th class="text-center grey-bg" style="width: 15%">UNITS</th>
+          <th class="text-center grey-bg" style="width: 15%">PALLET&nbsp;SPACE</th>
+          <th class="text-center grey-bg" style="width: 15%">SQM</th>
+          <th class="text-center grey-bg" style="width: 15%">KG</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>TOTAL</th>
+          <th class="text-center">{{ to.totals.units|fi_nbr }}</th>
+          <th class="text-center">{{ to.totals.pallet_space|fi_nbr:0 }}</th>
+          <th class="text-center">{{ to.totals.footprint|fi_nbr:2 }}</th>
+          <th class="text-center">{{ to.totals.weight|fi_nbr:0 }}</th>
+        </tr>
+      </tbody>
+    </table>
+
+  {% endfor %}
+
+</div> <!-- .container -->
+
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+$(document).ready(function() {
+});
+</script>
+
+{% endblock %}

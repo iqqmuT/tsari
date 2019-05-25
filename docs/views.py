@@ -15,8 +15,7 @@ from avdb.models import Convention, \
 import logging
 logger = logging.getLogger(__name__)
 
-@user_passes_test(lambda u: u.is_superuser)
-def transport_orders(request, year):
+def get_year_transport_orders(year):
     start = datetime(year, 1, 1)
     end = datetime(year, 12, 31, 23, 59, 59)
 
@@ -27,7 +26,6 @@ def transport_orders(request, year):
         Q(to_convention__load_in__range=(start, end))
     ).filter(disabled=False).order_by('created')
 
-    #tos = TransportOrder.objects.filter(disabled=False)
     to_ids = []
     all_similar = set()
     for to in tos:
@@ -39,11 +37,49 @@ def transport_orders(request, year):
 
     # sort list of transport orders alphabetically
     to_ids.sort(key=lambda to: str(to))
+    return to_ids
 
+@user_passes_test(lambda u: u.is_superuser)
+def transport_orders(request, year):
+    tos = get_year_transport_orders(year)
     return render(request, 'docs/transport_orders.html', {
-        'tos': to_ids,
+        'tos': tos,
         'year': year,
     })
+
+@user_passes_test(lambda u: u.is_superuser)
+def print_transport_orders(request, year):
+    tos = get_year_transport_orders(year)
+
+    # add totals
+    for to in tos:
+        # calculate totals
+        totals = {
+            'units': 0,
+            'pallet_space': 0,
+            'footprint': 0,
+            'weight': 0,
+            'capacity': 0,
+            'max_height': 0,
+        }
+        similar_tos = _find_similar_tos(to)
+        for sto in similar_tos:
+            for to_line in sto.transportorderline_set.filter(equipment__disabled=False):
+                totals['units'] += to_line.equipment.get_parent_units().count()
+                totals['pallet_space'] += to_line.equipment.pallet_space
+                totals['footprint'] += to_line.equipment.footprint
+                totals['weight'] += to_line.equipment.weight_kg()
+                totals['capacity'] += to_line.equipment.capacity()
+                if to_line.equipment.max_height() / 1000 > totals['max_height']:
+                    totals['max_height'] = to_line.equipment.max_height() / 1000
+        to.totals = totals
+
+
+    return render(request, 'docs/print_transport_orders.html', {
+        'tos': tos,
+        'year': year,
+    })
+
 
 @user_passes_test(lambda u: u.is_superuser)
 def transport_order(request, to_id):
@@ -119,7 +155,7 @@ def conventions(request, year):
         'year': year,
         'conventions': conventions,
     })
- 
+
 @user_passes_test(lambda u: u.is_superuser)
 def convention_equipments(request, pk):
     convention = get_object_or_404(Convention, pk=pk)
@@ -158,7 +194,7 @@ def convention_equipments(request, pk):
         'to_lines': to_lines,
         'now': datetime.now(),
     })
- 
+
 def _find_similar_tos(to):
     """Returns similar TOs which share same load in and out times, and locations."""
     tos = TransportOrder.objects.filter(
