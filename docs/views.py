@@ -146,6 +146,7 @@ def transport_order(request, to_id):
         'from_qr': from_qr,
         'to_qr': to_qr,
         'dir_qr': dir_qr,
+        'now': datetime.now(),
     })
 
 @user_passes_test(lambda u: u.is_superuser)

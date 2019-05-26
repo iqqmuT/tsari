@@ -9,7 +9,20 @@
 {% load qr_code %}
 
 <div class="container to-container">
-  <div class="position-absolute" style="right: 10px; top: 0">
+
+<table style="width: 100%;">
+  <thead>
+    <tr>
+      <td>FINLAND BRANCH {{ now|date:"Y" }}</td>
+      <td style="text-align: right">Transport Order {{ to.name }}</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="2">
+
+
+  <div class="position-absolute" style="right: 10px; top: 20px">
     {% qr_from_text dir_qr size="t" %}
   </div>
 
@@ -80,7 +93,7 @@
       {% endif %}
     </div>
   </div>
-  <!-- 
+  <!--
   <div class="row">
     <div class="col-6">
       {% qr_from_text from_qr size="s" %}
@@ -245,6 +258,13 @@
       {{ totals.weight|greek_talents }} Greek talents.
     </small>
   </p>
+
+      </td> <!-- content cell -->
+    </tr>
+  </tbody>
+</table>
+
+
 </div> <!-- .container -->
 
 {% endblock %}
