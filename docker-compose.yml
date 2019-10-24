@@ -6,7 +6,7 @@ services:
     restart: always
     volumes:
       # use data volume to persist database data
-        - tsari-data:/var/lib/postgresql/data
+        - db-data:/var/lib/postgresql/data
   web:
     build: .
     command: python3 manage.py runserver 0.0.0.0:8000
@@ -18,4 +18,4 @@ services:
       - db
 
 volumes:
-  tsari-data:
+  db-data:
