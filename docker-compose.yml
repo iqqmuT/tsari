@@ -2,7 +2,11 @@ version: '3'
 
 services:
   db:
-    image: postgres
+    image: postgres:12-alpine
+    restart: always
+    volumes:
+      # use data volume to persist database data
+        - tsari-data:/var/lib/postgresql/data
   web:
     build: .
     command: python3 manage.py runserver 0.0.0.0:8000
@@ -12,3 +16,6 @@ services:
       - "8000:8000"
     depends_on:
       - db
+
+volumes:
+  tsari-data:
